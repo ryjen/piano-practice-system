@@ -79,8 +79,8 @@ def warmups_for_prepare(config: dict, allowed: set[str],
         technique = row["technique_id"]
         minutes = row["minutes"]
         prompt = row["prompt"]
-        if (technique not in allowed or technique in seen
-                or type(minutes) is not int or minutes < 1
+        if (not isinstance(technique, str) or technique not in allowed
+                or technique in seen or type(minutes) is not int or minutes < 1
                 or not isinstance(prompt, str) or not 1 <= len(prompt) <= 200):
             raise ValueError("invalid warmup technique, duration, or prompt")
         seen.add(technique)
@@ -100,10 +100,15 @@ def reviewed_context(active: list[dict], by_id: dict[str, dict],
                        or s.get("repertoire_id") is not None)]
     if not candidates:
         return []
-    # Equal-date tie: later approval revision wins when present.
-    source = max(candidates, key=lambda s: (
-        s["date"], s.get("applied_revision", 0)
-    ))
+    # Equal-date tie: later approval revision wins when present. A malformed
+    # local revision is not an excuse to guess which historical record won.
+    def order(row: dict) -> tuple[str, int]:
+        revision = row.get("applied_revision", 0)
+        if type(revision) is not int or revision < 0:
+            raise ValueError("invalid reviewed context approval revision")
+        return row["date"], revision
+
+    source = max(candidates, key=order)
     ref = {
         "source_event_id": source.get("id"),
         "source_practice_date": source["date"],

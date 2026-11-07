@@ -134,6 +134,22 @@ class WeightedPracticePlanTests(unittest.TestCase):
         }])
         self.assertEqual(self.state["revision"], 0)
 
+    def test_malformed_warmup_id_and_reviewed_revision_fail_closed(self):
+        bad = copy.deepcopy(self.config)
+        bad["warmups"][0]["technique_id"] = {"not": "hashable"}
+        with self.assertRaisesRegex(ValueError, "invalid warmup"):
+            propose(self.catalog, self.state, bad, "2026-11-10")
+        self.state["sessions"].append({
+            "id": "reading-malformed", "date": "2026-11-01",
+            "exercise_id": "reading-staff-steps", "approved": True,
+            "feedback": "appropriate", "comfort": "comfortable",
+            "passed": True, "method_book_id": "alfred-basic-adult-1",
+            "applied_revision": "not-an-integer"
+        })
+        with self.assertRaisesRegex(ValueError, "invalid reviewed context"):
+            propose(self.catalog, self.state, self.config, "2026-11-10",
+                    focus_override="reading")
+
     def test_cli_focus_override_is_read_only(self):
         cmd = [sys.executable, "-m", "piano_practice.cli", "plan",
                "--date", "2026-11-10", "--focus", "scale-patterns"]

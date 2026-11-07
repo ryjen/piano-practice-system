@@ -102,3 +102,10 @@ The chosen octaves, LH-rest interpretation during RH's return, and crossing
 landmarks are provisional, user-specific reference choices pending manual
 verification. Do not claim the current exercise notation is a validated
 reproduction of a teacher's technique or an Alfred arrangement.
+
+
+Normalized legacy exercises with unknown intended hand (`hands: [null]`)
+export as a single reference staff containing every note, not two empty
+staves. A mixed named/unknown intended-hand score fails explicitly until
+a deliberate hand assignment is reviewed; no note may silently turn
+into a rest as a fallback.

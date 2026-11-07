@@ -117,6 +117,12 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str,
         focus = focus_override
         selection["priority"] = "manual-override"
     selection["chosen"] = focus
+    # A manual choice can itself be in the recovery queue, even when an
+    # older/high-priority obligation appears first for another technique.
+    selected_due = next((item for item in due
+                         if item["technique_id"] == focus), None)
+    if selected_due is not None:
+        selection["selected_obligation"] = dict(selected_due)
     choices = sorted((e for e in catalog["exercises"] if e["technique_id"] == focus),
                      key=lambda e: (e["level"], e["id"]))
     foundation = [e for e in choices if e["level"] == 0]
@@ -147,15 +153,14 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str,
     }
     regression_signal = bool(latest_adverse) and len(successful_dates) < 2
     maintenance_recovery = bool(
-        due and focus == due[0]["technique_id"] and
-        due[0].get("reason") == "adverse-feedback"
+        selected_due and selected_due["reason"] == "adverse-feedback"
     )
     # Recovery always outranks ordinary advancement, even when historical
     # foundation successes would otherwise select the advanced exercise.
     if maintenance_recovery:
         exercise = foundation
     elif ((len(successful_dates) >= 2 and not regression_signal)
-          or (due and focus == due[0]["technique_id"])):
+          or selected_due is not None):
         exercise = advanced[0]
     else:
         exercise = foundation
@@ -172,16 +177,20 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str,
             rationale = "recent explicit difficulty: simplify tempo without advancing"
         else:
             rationale = "rotated technique using approved feedback and practice history"
-    if due and focus == due[0]["technique_id"]:
+    if selected_due is not None:
         rationale = (
             "approved maintenance recovery required"
             if maintenance_recovery else
-            "approved maintenance verification due: " + due[0]["due_date"]
+            "approved maintenance verification due: " + selected_due["due_date"]
         )
     elif config.get("goal_weights") is not None:
         rationale = "weighted staleness over approved practice history"
     if focus_override is not None:
-        rationale = "manual focus override; no proficiency claim"
+        rationale = (
+            rationale + "; manually selected, no proficiency claim"
+            if selected_due is not None else
+            "manual focus override; no proficiency claim"
+        )
     minutes = config["duration_minutes"]
     if minutes not in (15, 20, 30):
         raise ValueError("duration_minutes must be 15, 20, or 30")

@@ -81,4 +81,3 @@ already-identified method-book or recital milestones; they are not proof of
 completion or a license to reproduce source sheets. Weighted planning does
 not mutate learner state, approve competency, or allocate more minutes than
 configured.
-

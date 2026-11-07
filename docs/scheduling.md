@@ -21,6 +21,9 @@ before the requested session date. The weight must be an integer 1–5 for
   overdue verification, and both precede weighted preference selection.
 - A deliberate `--focus TECHNIQUE` override wins over the suggestion,
   but emits a warning when it defers a recovery/maintenance obligation.
+  If the manually chosen technique also has an adverse recovery obligation,
+  **its own recovery gate remains enforced**, with the selected obligation
+  included in the proposal. Overriding does not silently promote it.
 - No scheduling choice changes the player's state, success evidence, or
   competency. An additional state transition always requires explicit review.
 
