@@ -21,7 +21,7 @@ Contracts are local-first and machine-readable JSON. Preserve compatibility by a
 
 ## Authority, integrity and uncertainty
 
-The state moves only through explicit, reviewed `feedback apply` or `progression apply` operations, never through `plan`, MIDI scores, or calendar metadata. Each accepted event increments a state revision; exact repeated proposals are idempotent, and stale/conflicting event IDs or altered source contents are rejected. Separate writers must honor the same POSIX sidecar lock. SHA-256 acknowledgement keys bind reviewed *content*, **not user authentication/signature or multi-user authorization**.
+The state moves only through explicit, reviewed `feedback apply` or `progression apply` operations, never through `plan`, MIDI scores, or calendar metadata. Approved session history is capped at 10,000 records and progression history at 10,000 events; the system fails closed at capacity and does not silently prune older evidence. Session event IDs must be unique when present, while legacy records without IDs remain readable. Each accepted event increments a state revision; exact repeated proposals are idempotent, and stale/conflicting event IDs or altered source contents are rejected. Separate writers must honor the same POSIX sidecar lock. SHA-256 acknowledgement keys bind reviewed *content*, **not user authentication/signature or multi-user authorization**.
 
 `feedback/v2` is required to establish isolation/musical-context competency gates. The player supplies difficulty/comfort and whether the task was accomplished; a MIDI result cannot supply fingering, staff comprehension, hand identity, physical comfort or acoustic performance. Missing evidence remains `unknown` or `blocked`, not guessed.
 
