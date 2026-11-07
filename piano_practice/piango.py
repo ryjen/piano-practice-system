@@ -58,9 +58,18 @@ def _parts(exercise: dict, spellings: list[str]) -> list[tuple[str, str, str, li
     # for MIDI assessment. Legacy sequential drills keep a single staff.
     if exercise.get("realization") is None:
         return [("P1", "Piano (right-hand reference)", "G", spellings)]
+    groups = onset_groups(exercise)
+    # A normalized legacy realization explicitly preserves unknown hand
+    # identity. Render it on the reference staff, not as two tracks of rests.
+    if all(group["hands"] == [None] for group in groups):
+        return [("P1", "Piano (unspecified-hand reference)", "G", spellings)]
+    # Mixed unnamed/named roles are valid evidence but not an exportable
+    # two-track score without inventing a hand assignment. Fail closed.
+    if any(None in group["hands"] for group in groups):
+        raise ValueError("cannot export a mixed named/unspecified-hand realization")
     right, left = [], []
     cursor = 0
-    for group in onset_groups(exercise):
+    for group in groups:
         span = len(group["pitches"])
         written = spellings[cursor:cursor + span]
         cursor += span
