@@ -35,3 +35,8 @@ Hosted subscriptions, mandatory AI services, uploading private practice logs, au
 ### Personal technique follow-up
 
 The authored five-phase scale pattern is provisionally mapped in C major; physical starting octaves, contrary-motion geometry, and the LH 3→4 crossing references require direct player/teacher confirmation. The reference score and named phase metadata are not a finger-detection system. Transposing these patterns to additional keys and adding left/right-specific fingering recommendations remains an opt-in later enhancement.
+
+
+### Goal-weighted planner (software)
+
+An optional bounded `goal_weights` map is evaluated against approved session recency. The planner remains read-only and returns an inspectable score/rationale, uses in-budget reading/coordination warm-ups, accepts an explicit `--focus` override with a deferred-recovery warning, and replays private reviewed Alfred/repertoire checkpoints without claiming completion. Legacy config without weights still rotates by least recent technique. All dates remain injected rather than relying on clock/network state.

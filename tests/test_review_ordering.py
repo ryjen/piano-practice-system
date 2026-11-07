@@ -69,6 +69,14 @@ class MaintenancePriorityTests(unittest.TestCase):
         self.assertEqual(next_session["technique_id"], "pulse")
         self.assertEqual(next_session["exercise_id"], "pulse-quarter")
         self.assertIn("recovery", next_session["rationale"])
+        override = propose(
+            self.catalog, self.state(), self.config,
+            "2026-11-12", focus_override="arpeggios"
+        )
+        self.assertEqual(override["technique_id"], "arpeggios")
+        self.assertEqual(override["selection"]["priority"], "manual-override")
+        self.assertIn("defers adverse-feedback for pulse", override["warnings"][0])
+        self.assertEqual(override["exercise_id"], "arpeggio-major-one-octave")
 
 
 if __name__ == "__main__":

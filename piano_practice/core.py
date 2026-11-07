@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import date
 
 from .timeline import onset_groups
+from .scheduling import weighted_focus, warmups_for_prepare, reviewed_context
 
 STATES = ("discovered", "developing", "reliable-isolation",
           "reliable-context", "maintained", "paused", "retired")
@@ -71,7 +72,8 @@ def validate_state(state: dict, catalog: dict) -> None:
             raise ValueError("approved must be boolean")
 
 
-def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
+def propose(catalog: dict, state: dict, config: dict, on_date: str,
+            focus_override: str | None = None) -> dict:
     """Return a reproducible proposal from explicit inputs, without writing state.
 
     Selection rotates focus by least recently *approved* practice date. Level 1
@@ -89,11 +91,11 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         raise ValueError("config and catalog technique IDs differ")
     active = [s for s in state["sessions"] if s["approved"] and s["date"] <= on_date]
     by_id = {e["id"]: e for e in catalog["exercises"]}
-    last_by_technique = {}
-    for technique in techniques:
-        history = [s for s in active if by_id[s["exercise_id"]]["technique_id"] == technique]
-        last_by_technique[technique] = max((s["date"] for s in history), default="")
-    focus = min(techniques, key=lambda t: (last_by_technique[t], techniques.index(t)))
+    focus, selection = weighted_focus(
+        techniques, active, by_id, on_date, config.get("goal_weights")
+    )
+    if focus_override is not None and focus_override not in allowed:
+        raise ValueError("unknown manual focus technique")
     due = []
     if state.get("progression_events"):
         from .progression import maintenance_due
@@ -102,6 +104,19 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         )
     if due:
         focus = due[0]["technique_id"]
+        selection["priority"] = due[0]["reason"]
+    else:
+        selection["priority"] = "weighted-preference" if config.get("goal_weights") else "recency"
+    warnings = []
+    if focus_override is not None:
+        if due and focus_override != focus:
+            warnings.append(
+                "manual focus override defers " + due[0]["reason"] +
+                " for " + due[0]["technique_id"]
+            )
+        focus = focus_override
+        selection["priority"] = "manual-override"
+    selection["chosen"] = focus
     choices = sorted((e for e in catalog["exercises"] if e["technique_id"] == focus),
                      key=lambda e: (e["level"], e["id"]))
     foundation = [e for e in choices if e["level"] == 0]
@@ -131,12 +146,16 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         and s["date"] > latest_adverse
     }
     regression_signal = bool(latest_adverse) and len(successful_dates) < 2
-    maintenance_recovery = bool(due and due[0].get("reason") == "adverse-feedback")
+    maintenance_recovery = bool(
+        due and focus == due[0]["technique_id"] and
+        due[0].get("reason") == "adverse-feedback"
+    )
     # Recovery always outranks ordinary advancement, even when historical
     # foundation successes would otherwise select the advanced exercise.
     if maintenance_recovery:
         exercise = foundation
-    elif (len(successful_dates) >= 2 and not regression_signal) or due:
+    elif ((len(successful_dates) >= 2 and not regression_signal)
+          or (due and focus == due[0]["technique_id"])):
         exercise = advanced[0]
     else:
         exercise = foundation
@@ -153,24 +172,34 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
             rationale = "recent explicit difficulty: simplify tempo without advancing"
         else:
             rationale = "rotated technique using approved feedback and practice history"
-    if due:
+    if due and focus == due[0]["technique_id"]:
         rationale = (
             "approved maintenance recovery required"
             if maintenance_recovery else
             "approved maintenance verification due: " + due[0]["due_date"]
         )
+    elif config.get("goal_weights") is not None:
+        rationale = "weighted staleness over approved practice history"
+    if focus_override is not None:
+        rationale = "manual focus override; no proficiency claim"
     minutes = config["duration_minutes"]
     if minutes not in (15, 20, 30):
         raise ValueError("duration_minutes must be 15, 20, or 30")
     # All stage allocations remain bounded and exactly sum to duration.
     allocations = {15: (2, 2, 6, 3, 2), 20: (3, 3, 8, 4, 2), 30: (4, 4, 13, 6, 3)}
     stages = ("prepare", "baseline", "isolation", "musical-context", "verification")
+    warmup = warmups_for_prepare(config, allowed, allocations[minutes][0])
+    context_refs = reviewed_context(active, by_id, focus)
     return {
         "record_type": "session-proposal",
         "contract_version": "session/v1",
         "date": on_date,
         "timezone": config["timezone"],
         "state_revision": state["revision"],
+        "selection": selection,
+        "warnings": warnings,
+        "warmups_within_prepare": warmup,
+        "previous_context_references": context_refs,
         "technique_id": focus,
         "exercise_id": exercise["id"],
         "exercise_title": exercise["title"],

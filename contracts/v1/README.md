@@ -18,7 +18,7 @@ Contracts are local-first and machine-readable JSON. Preserve compatibility by a
 | `progression/v1` | `pianoctl progression evaluate/apply` | Bounded multi-session gate proposal and distinct explicit approval; one-step regression and maintained-state maintenance queue |
 | `midi-trace-inspection/v1` | `pianoctl hardware <take>` | Structural diagnostic from provided MIDI bytes; **never physical device attestation** |
 | Original MusicXML | `pianoctl notation --exercise ...` | Original single-staff exercise generated from public note sequences; no imported Alfred notation |
-| PianGo MusicXML | `pianoctl export --target piango --exercise ...` | Deterministic original-score export of all 18 catalog drills; model-specific two-hand timelines, authored enharmonic spellings, optional *illustrative* printed fingerings. Import and observed technique remain unverified |
+| PianGo MusicXML | `pianoctl export --target piango --exercise ...` | Deterministic original-score export of all 22 catalog drills; model-specific two-hand timelines, authored enharmonic spellings, optional *illustrative* printed fingerings. Import and observed technique remain unverified |
 
 ## Authority, integrity and uncertainty
 
@@ -63,3 +63,22 @@ preserve **unspecified** hand identity. In an explicit simultaneous pair, both
 intended roles must be named distinctly `left` and `right`.
 MIDI timing and within-group synchronization are `unknown` (not passing)
 when any extra onset remains unmatched after consuming the expected groups.
+
+### Optional weighted scheduling
+
+`practice-config/v1` may specify `goal_weights`: one integer weight 1–5
+for each configured technique, and `warmups`: a bounded set of prompts whose
+durations fit **within** `session/v1`'s prepare allocation. Missing
+`goal_weights` preserves legacy least-recent scheduling. The weighted policy
+(`weighted-staleness/v1`) multiplies explicit user weights by elapsed days
+from last approved practice (with an increasing age for not-yet-practiced
+techniques). It exposes a per-candidate score breakdown. Adverse recovery
+precedence and explicit manual `--focus` are transparent; manual override
+carries a warning when it defers recovery.
+
+`session/v1` also includes reviewed `previous_context_references` to
+already-identified method-book or recital milestones; they are not proof of
+completion or a license to reproduce source sheets. Weighted planning does
+not mutate learner state, approve competency, or allocate more minutes than
+configured.
+

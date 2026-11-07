@@ -23,6 +23,9 @@ class PlannerTests(unittest.TestCase):
             if e["technique_id"] in ("pulse", "navigation", "dynamics")
         ]
         self.config["technique_order"] = ["pulse", "navigation", "dynamics"]
+        # Legacy tests verify original least-recent behavior without weights.
+        self.config.pop("goal_weights", None)
+        self.config.pop("warmups", None)
         self.state = load("examples/learner-state.json")
 
     def add(self, date, exercise, feedback="appropriate", passed=True,
