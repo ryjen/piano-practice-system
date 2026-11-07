@@ -19,6 +19,7 @@ Practice is useful without a MIDI keyboard, DAW, song library, AI provider, clou
 | Human-reviewed, revision-safe feedback application | Implemented, explicit approval required |
 | Context-bound feedback/v2 and separate progression gates | Implemented, explicit approval required |
 | MusicXML export of original reading and minor-key exercises | Implemented |
+| PianGo-compatible MusicXML export of all 18 exercises, optional annotated reference fingerings | Implemented; browser/device import unverified |
 | Alfred Level 1–2 and recital metadata catalog | Implemented (references only) |
 | Maintenance-due proposals from approved practice | Implemented |
 | Automatic mastery promotion, synchronized metronome, synthesis, UI, calendar notifications | Not implemented |
@@ -75,6 +76,28 @@ python3 -m piano_practice.cli notation --exercise minor-harmonic > local/minor-h
 ```
 
 The generated examples are original, single-staff note-reading material. They do **not** generate or copy editions of the named recital pieces, and they do not assess hands-together performance automatically. See [curriculum and recital planning](docs/curriculum.md).
+
+### PianGo score export and fingering references
+
+[PianGo](https://piango.app/) can import MusicXML directly, including printed fingering. Export any original catalog exercise for its key-by-key practice interface:
+
+```sh
+mkdir -p local
+python3 -m piano_practice.cli export --target piango \
+  --exercise reading-staff-steps > local/reading-piango.musicxml
+
+# Add an illustrative RH fingering reference where a curated example exists:
+python3 -m piano_practice.cli export --target piango \
+  --exercise minor-harmonic --fingering-reference \
+  > local/minor-harmonic-piango.musicxml
+
+# Correctly synchronized left/right hand note sequences:
+python3 -m piano_practice.cli export --target piango \
+  --exercise coordination-together > local/hands-together-piango.musicxml
+```
+
+Open the generated file at [PianGo](https://piango.app/) using its file chooser. Exporting is offline, read-only, and does not send practice data anywhere. **Fingering guidance is not finger-tracking or technique assessment**; the Oxygen Pro 61's physical import/playback path is still unverified. The existing `notation` command remains available. See the [PianGo integration reference and full limitations](docs/piango.md).
+
 
 ## Quick start — no keyboard required
 
