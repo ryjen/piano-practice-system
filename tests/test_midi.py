@@ -59,6 +59,49 @@ class MidiAssessmentTests(unittest.TestCase):
         self.assertTrue(result["pass"])
         self.assertEqual(result["declared_bpm"], 40)
 
+    def test_high_tempo_collapsed_attacks_fail_timing(self):
+        take = copy.deepcopy(self.take)
+        take["exercise_id"] = "pulse-eighth"
+        take["bpm"] = 180
+        take["events"] = []
+        for _ in range(8):
+            take["events"].extend([
+                dict(t_ms=0, type="note_on", note=60, channel=0, velocity=70),
+                dict(t_ms=0, type="note_off", note=60, channel=0, velocity=0),
+            ])
+        result = assess(take, self.catalog)
+        self.assertEqual(result["checks"]["pitch_sequence"], "pass")
+        self.assertEqual(result["checks"]["note_lifecycle"], "pass")
+        self.assertEqual(result["checks"]["inter_onset_intervals"], "fail")
+        self.assertFalse(result["pass"])
+        self.assertLess(result["timing_tolerance_ms"], result["target_interval_ms"])
+
+    def test_high_tempo_even_notes_pass_timing(self):
+        take = copy.deepcopy(self.take)
+        take["exercise_id"] = "pulse-eighth"
+        take["bpm"] = 180
+        take["events"] = []
+        for i in range(8):
+            start = round(i * (60000 / 180 / 2))
+            take["events"].extend([
+                dict(t_ms=start, type="note_on", note=60, channel=0, velocity=70),
+                dict(t_ms=start+50, type="note_off", note=60, channel=0, velocity=0),
+            ])
+        self.assertTrue(assess(take, self.catalog)["pass"])
+
+    def test_alternating_dynamics_rejects_crescendo(self):
+        take = copy.deepcopy(self.take)
+        take["exercise_id"] = "dynamics-contrast"
+        take["events"] = []
+        for i, velocity in enumerate([10, 22, 34, 46, 58, 70]):
+            take["events"].extend([
+                dict(t_ms=i*1000, type="note_on", note=60, channel=0, velocity=velocity),
+                dict(t_ms=i*1000+350, type="note_off", note=60, channel=0, velocity=0),
+            ])
+        result = assess(take, self.catalog)
+        self.assertEqual(result["checks"]["relative_dynamics"], "fail")
+        self.assertFalse(result["pass"])
+
     def test_wrong_note_fails(self):
         self.take["events"][0]["note"] = 61
         self.take["events"][1]["note"] = 61

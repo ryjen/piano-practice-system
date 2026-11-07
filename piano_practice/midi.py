@@ -60,8 +60,11 @@ def assess(take: dict, catalog: dict) -> dict:
     target_interval = 60000.0 / declared_bpm / ex["subdivision"]
     gaps = [onsets[i+1]["t_ms"] - onsets[i]["t_ms"] for i in range(len(onsets)-1)]
     deviation = max((abs(g - target_interval) for g in gaps), default=None)
+    # Use a bounded absolute tolerance at slow tempo, and a relative tolerance
+    # at fast subdivisions. A fixed 180 ms gate can accept collapsed notes.
+    timing_tolerance_ms = min(120.0, target_interval * 0.25)
     timing = "unknown" if len(gaps) != len(expected)-1 else (
-        "pass" if deviation is not None and deviation <= 180 else "fail"
+        "pass" if deviation is not None and deviation <= timing_tolerance_ms else "fail"
     )
     lifecycle = "pass" if not errors else "fail"
     dynamics = "not-applicable"
@@ -70,9 +73,12 @@ def assess(take: dict, catalog: dict) -> dict:
             dynamics = "unknown"
         else:
             values = [e["velocity"] for e in onsets]
-            dynamics = "pass" if all(
-                values[i+1] >= values[i] + 12 for i in range(0, len(values)-1, 2)
-            ) else "fail"
+            # Verify both alternating edges; a simple crescendo must not pass.
+            rises = all(values[i+1] - values[i] >= 12
+                        for i in range(0, len(values)-1, 2))
+            falls = all(values[i] - values[i+1] >= 12
+                        for i in range(1, len(values)-1, 2))
+            dynamics = "pass" if rises and falls else "fail"
     checks = {
         "pitch_sequence": pitches,
         "inter_onset_intervals": timing,
@@ -89,6 +95,7 @@ def assess(take: dict, catalog: dict) -> dict:
         "observed_note_count": len(onsets),
         "declared_bpm": declared_bpm,
         "target_interval_ms": round(target_interval, 3),
+        "timing_tolerance_ms": round(timing_tolerance_ms, 3),
         "max_interval_deviation_ms": None if deviation is None else round(deviation, 3),
         "lifecycle_errors": sorted(set(errors)),
         "limitations": [
