@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .core import propose
 from .notation import to_musicxml
+from .piango import to_piango_musicxml
 from .hardware import inspect as inspect_hardware_trace
 from .progression import evaluate as evaluate_progression, apply as apply_progression, maintenance_due
 from .feedback import apply as apply_feedback, proposal as feedback_proposal
@@ -87,6 +88,13 @@ def main(argv=None) -> int:
     due.add_argument("--config", default="config/practice.json")
     due.add_argument("--catalog", default="catalogs/exercises.json")
 
+    exported = sub.add_parser("export", help="export an original practice exercise to an external score app")
+    exported.add_argument("--target", required=True, choices=("piango",))
+    exported.add_argument("--exercise", required=True)
+    exported.add_argument("--catalog", default="catalogs/exercises.json")
+    exported.add_argument("--fingering-reference", action="store_true",
+                          help="include illustrative printed fingerings where the exercise defines them")
+
     hardware = sub.add_parser("hardware", help="inspect captured MIDI evidence without claiming physical qualification")
     hardware.add_argument("take", help="captured local midi-take/v1 JSON")
     notation = sub.add_parser("notation", help="original single-staff MusicXML exercise")
@@ -137,6 +145,11 @@ def main(argv=None) -> int:
                     _load(args.catalog), _load(args.state), args.date,
                     _load(args.config)["maintenance_interval_days"]
                 )})
+        elif args.command == "export":
+            sys.stdout.write(to_piango_musicxml(
+                _load(args.catalog), args.exercise,
+                fingering_reference=args.fingering_reference,
+            ))
         elif args.command == "notation":
             sys.stdout.write(to_musicxml(_load(args.catalog), args.exercise))
         elif args.command == "hardware":
