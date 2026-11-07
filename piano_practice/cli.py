@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from .core import propose
+from .feedback import apply as apply_feedback, proposal as feedback_proposal
 from .midi import assess
 from .midi_io import capture, input_ports
 
@@ -37,6 +38,26 @@ def main(argv=None) -> int:
     record.add_argument("--exercise", required=True)
     record.add_argument("--seconds", type=float, default=20)
     record.add_argument("--bpm", type=int, help="declared practice tempo; defaults to catalog tempo when omitted")
+
+    feedback = sub.add_parser("feedback", help="prepare or explicitly approve local session feedback")
+    feedback_cmds = feedback.add_subparsers(dest="feedback_command", required=True)
+    draft = feedback_cmds.add_parser("propose", help="read-only feedback proposal with approval key")
+    draft.add_argument("--state", required=True, help="existing private learner state JSON")
+    draft.add_argument("--catalog", default="catalogs/exercises.json")
+    draft.add_argument("--id", required=True, help="unique stable feedback event id")
+    draft.add_argument("--date", required=True, help="ISO local practice date")
+    draft.add_argument("--exercise", required=True)
+    draft.add_argument("--feedback", choices=("easy", "appropriate", "hard"), required=True)
+    draft.add_argument("--comfort", choices=("comfortable", "tension", "unknown"), required=True)
+    draft.add_argument("--passed", choices=("yes", "no", "unknown"), required=True)
+    draft.add_argument("--bpm", required=True, type=int)
+    draft.add_argument("--evidence-ref", action="append", default=[])
+    approve = feedback_cmds.add_parser("apply", help="explicit, revision-safe approval of reviewed proposal")
+    approve.add_argument("proposal", help="previously reviewed feedback proposal JSON")
+    approve.add_argument("--state", required=True, help="existing private learner state JSON")
+    approve.add_argument("--catalog", default="catalogs/exercises.json")
+    approve.add_argument("--acknowledge", required=True, help="exact approval_key from reviewed proposal")
+
     args = parser.parse_args(argv)
     try:
         if args.command == "plan":
@@ -47,6 +68,20 @@ def main(argv=None) -> int:
             _print({"ports": input_ports()})
         elif args.command == "capture":
             _print(capture(args.port, args.seconds, args.exercise, args.bpm))
+        elif args.command == "feedback":
+            if args.feedback_command == "propose":
+                passed = {"yes": True, "no": False, "unknown": None}[args.passed]
+                _print(feedback_proposal(
+                    _load(args.catalog), _load(args.state),
+                    event_id=args.id, on_date=args.date, exercise_id=args.exercise,
+                    feedback=args.feedback, comfort=args.comfort, passed=passed,
+                    realized_bpm=args.bpm, evidence_refs=args.evidence_ref
+                ))
+            elif args.feedback_command == "apply":
+                _print(apply_feedback(
+                    Path(args.state), _load(args.catalog), _load(args.proposal),
+                    args.acknowledge
+                ))
     except (ValueError, OSError, KeyError, TypeError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"pianoctl: {exc}", file=sys.stderr)
         return 2

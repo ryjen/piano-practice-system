@@ -37,6 +37,8 @@ flowchart TD
 - Inter-onset checks admit at most ±min(120 ms, 25% of expected interval) for a declared tempo; they do not establish absolute click alignment or musical expressiveness.
 - Capture never attests to a hardware configuration. Synthetic fixtures test logical contracts, not the Oxygen USB stack.
 - No scores silently update progression. No inference from missing observations. No proficiency or repertoire assumption.
+- Feedback proposals bind explicit event fields to a state revision via a stable SHA-256 acknowledgement key (not authentication). An explicit apply operation is required; a POSIX sibling file lock serializes cooperating writers and an atomic replace persists the new revision.
+- Unknown comfort and unknown subjective success remain unknown. An approved feedback event may influence the next recommended exercise, but is never a proof of mastery in the instrument domain.
 
 ## Future compatible extensions
 
