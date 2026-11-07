@@ -123,6 +123,16 @@ def to_piango_musicxml(catalog: dict, exercise_id: str,
     fingers = FINGERING_REFERENCES.get(exercise_id) if fingering_reference else None
     if fingers is not None and (len(parts) != 1 or len(fingers) != len(spellings)):
         raise ValueError("fingering reference does not fit exercise")
+    realization = ex.get("realization") or {}
+    # Printed cues are the player's user-authored reference landmarks,
+    # never measurements or a universal fingering prescription.
+    cue_map = {
+        (cue["onset_index"], cue["hand"]): cue["finger"]
+        for cue in realization.get("finger_cues", [])
+    } if fingering_reference else {}
+    phase_starts = {
+        p["start"]: p["label"] for p in realization.get("phases", [])
+    }
     root = ET.Element("score-partwise", version="4.0")
     work = ET.SubElement(root, "work")
     ET.SubElement(work, "work-title").text = "Original practice: " + ex["title"]
@@ -154,8 +164,16 @@ def to_piango_musicxml(catalog: dict, exercise_id: str,
                     ET.SubElement(metro, "per-minute").text = str(ex["bpm"])
                     ET.SubElement(direction, "sound", tempo=str(ex["bpm"]))
             for event_index in range(start, start + per_measure):
+                if part_index == 0 and event_index in phase_starts:
+                    direction = ET.SubElement(measure, "direction")
+                    dtype = ET.SubElement(direction, "direction-type")
+                    ET.SubElement(dtype, "words").text = phase_starts[event_index]
                 written = events[event_index] if event_index < len(events) else None
-                finger = fingers[event_index] if fingers is not None and event_index < len(fingers) else None
+                hand = "right" if part_index == 0 else "left"
+                finger = (
+                    fingers[event_index] if fingers is not None and event_index < len(fingers)
+                    else cue_map.get((event_index, hand))
+                )
                 _write_note(measure, written, duration, kind, finger)
     ET.indent(root)
     return '<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(root, encoding="unicode") + "\n"

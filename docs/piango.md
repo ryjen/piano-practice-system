@@ -38,7 +38,7 @@ the local package. Exercise IDs come from `catalogs/exercises.json`.
 
 ## Exact semantics and limits
 
-- **All 18 current catalog exercises** can be exported. This is a transport
+- **All 22 current catalog exercises** can be exported. This is a transport
   representation of the public, authored drills, not a reproduction of a
   commercial method book or recital score.
 - Normal exercises are written as sequential notes at the catalog BPM.
@@ -86,3 +86,19 @@ The explicit coordination score timelines now come from the catalog's
 the intended hand pairing must pass catalog validation, MusicXML contract
 tests, and grouped MIDI tests together; generic `notes` arrays still cannot
 express arbitrary polyphony.
+
+
+### Two-handed scale exports
+
+`scale-crossings-two-octaves` writes parallel LH C3 / RH C4 lines through
+two C-major octaves, with optional printed LH finger 3 (A3) then finger 4
+(D4) crossings. `scale-five-phase-opposing` writes an original five-phase
+parallel/reverse/contrary-motion exercise, with direction labels placed at
+each phase boundary. The exporter gets every note and intended hand from
+the same versioned onset groups as the MIDI evaluator; neither PianGo nor
+MIDI can observe the actual fingers used.
+
+The chosen octaves, LH-rest interpretation during RH's return, and crossing
+landmarks are provisional, user-specific reference choices pending manual
+verification. Do not claim the current exercise notation is a validated
+reproduction of a teacher's technique or an Alfred arrangement.

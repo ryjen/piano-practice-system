@@ -46,3 +46,13 @@ metadata. `assessment/v1` adds a `within_group_sync` check and timing
 metrics for group starts while retaining its original pitch/lifecycle
 checks. Two-handed exercise results still carry an unknown required human
 observation and can never autonomously approve proficiency.
+
+
+An `onset-groups/v1` realization may additionally contain bounded, contiguous
+`phases` (named start/end beat indices) and optional `finger_cues`
+(intended hand, onset index, finger 1–5, descriptive label). Each cue must
+reference an actually present note for that intended hand; duplicate cues,
+unknown hands, out-of-range fingers and gapped phases fail catalog validation.
+These are instructional references, **never sensed fingering**. The five-phase
+C-major scale arrangement and LH finger 3/4 crossing cues are explicitly
+provisional player-provided goals, not qualified physical evidence.

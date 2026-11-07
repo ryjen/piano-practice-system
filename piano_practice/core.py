@@ -178,6 +178,8 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         "realization": {
             "contract_version": "onset-groups/v1",
             "onsets": onset_groups(exercise),
+            "phases": exercise.get("realization", {}).get("phases", []),
+            "finger_cues": exercise.get("realization", {}).get("finger_cues", []),
         },
         "instructions": exercise["instructions"],
         "self_check": exercise["self_check"],

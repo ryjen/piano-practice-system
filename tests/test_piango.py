@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from piano_practice.piango import STEPS, to_piango_musicxml
+from piano_practice.timeline import onset_groups
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,9 +51,15 @@ class PianGoExportTests(unittest.TestCase):
                     self.assertEqual(pitch_numbers(parts[0])[1::2][:4], expected[1::2])
                     self.assertEqual(pitch_numbers(parts[1])[::2][:4], expected[::2])
                     self.assertEqual(pitch_numbers(parts[1])[1::2][:4], [None] * 4)
-                elif ex["id"] == "coordination-together":
-                    self.assertEqual(pitch_numbers(parts[0])[:4], expected[1::2])
-                    self.assertEqual(pitch_numbers(parts[1])[:4], expected[::2])
+                elif ex.get("realization") is not None:
+                    groups = onset_groups(ex)
+                    for part_index, hand in enumerate(("right", "left")):
+                        intended = [
+                            next((note for note, role in zip(group["pitches"], group["hands"])
+                                  if role == hand), None)
+                            for group in groups
+                        ]
+                        self.assertEqual(pitch_numbers(parts[part_index])[:len(groups)], intended)
                     self.assertEqual(parts[0].findtext("./measure/attributes/clef/sign"), "G")
                     self.assertEqual(parts[1].findtext("./measure/attributes/clef/sign"), "F")
                 else:

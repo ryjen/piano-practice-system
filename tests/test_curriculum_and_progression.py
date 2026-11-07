@@ -28,14 +28,14 @@ class CurriculumTests(unittest.TestCase):
     def test_all_user_focus_areas_have_two_levels_and_unique_ids(self):
         validate_catalog(self.catalog)
         techniques = set(self.config["technique_order"])
-        self.assertEqual(len(techniques), 9)
+        self.assertEqual(len(techniques), 11)
         self.assertEqual(techniques, {x["technique_id"] for x in self.catalog["exercises"]})
         for technique in techniques:
             self.assertEqual(
                 sorted(x["level"] for x in self.catalog["exercises"] if x["technique_id"] == technique),
                 [0, 1],
             )
-        self.assertEqual(len(self.catalog["exercises"]), 18)
+        self.assertEqual(len(self.catalog["exercises"]), 22)
 
     def test_method_books_and_recital_examples_reference_known_techniques(self):
         ids = [x["id"] for x in self.curriculum["repertoire"]]
