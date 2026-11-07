@@ -85,6 +85,8 @@ def assess(take: dict, catalog: dict) -> dict:
         "note_lifecycle": lifecycle,
         "relative_dynamics": dynamics,
     }
+    if ex.get("assessment_mode") == "human":
+        checks["required_human_observation"] = "unknown"
     return {
         "record_type": "midi-assessment",
         "contract_version": "assessment/v1",

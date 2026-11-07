@@ -35,8 +35,17 @@ def _identifier(value: object, label: str) -> None:
 
 
 def _event(event: dict, catalog: dict) -> None:
-    if not isinstance(event, dict) or set(event) != set(SESSION_FIELDS):
+    base = set(SESSION_FIELDS)
+    extended = base | {"context", "observation", "repertoire_id"}
+    if not isinstance(event, dict) or set(event) not in (base, extended):
         raise ValueError("invalid feedback event fields")
+    if set(event) == extended:
+        if event["context"] not in ("isolation", "musical-context"):
+            raise ValueError("feedback/v2 requires explicit practice context")
+        if not isinstance(event["observation"], str) or len(event["observation"]) > 2000:
+            raise ValueError("invalid practice observation")
+        if event["repertoire_id"] is not None:
+            _identifier(event["repertoire_id"], "repertoire id")
     _identifier(event["id"], "feedback id")
     try:
         parsed = date.fromisoformat(event["date"])
@@ -67,15 +76,24 @@ def _event(event: dict, catalog: dict) -> None:
 
 def proposal(catalog: dict, state: dict, *, event_id: str, on_date: str,
              exercise_id: str, feedback: str, comfort: str,
-             passed: bool | None, realized_bpm: int, evidence_refs: list[str] | None = None) -> dict:
+             passed: bool | None, realized_bpm: int, evidence_refs: list[str] | None = None,
+             context: str | None = None, observation: str = "",
+             repertoire_id: str | None = None) -> dict:
     validate_catalog(catalog)
     validate_state(state, catalog)
     event = dict(id=event_id, date=on_date, exercise_id=exercise_id,
                  feedback=feedback, comfort=comfort, passed=passed,
                  realized_bpm=realized_bpm, evidence_refs=list(evidence_refs or []))
+    if context is None and (observation or repertoire_id is not None):
+        raise ValueError("feedback/v2 context is required for observations or repertoire")
+    version = "feedback/v1"
+    if context is not None:
+        version = "feedback/v2"
+        event.update(context=context, observation=observation,
+                     repertoire_id=repertoire_id)
     _event(event, catalog)
     bare = dict(
-        record_type="feedback-proposal", contract_version="feedback/v1",
+        record_type="feedback-proposal", contract_version=version,
         state_revision=state["revision"],
         state_digest="sha256:" + hashlib.sha256(canonical(state)).hexdigest(),
         catalog_digest="sha256:" + hashlib.sha256(canonical(catalog)).hexdigest(),
@@ -90,8 +108,13 @@ def _validate_proposal(proposed: dict, catalog: dict) -> str:
         "catalog_digest", "event", "approval_key"
     }:
         raise ValueError("invalid feedback proposal")
-    if proposed["record_type"] != "feedback-proposal" or proposed["contract_version"] != "feedback/v1":
+    if proposed["record_type"] != "feedback-proposal" or proposed["contract_version"] not in ("feedback/v1", "feedback/v2"):
         raise ValueError("unsupported proposal version")
+    expected_fields = set(SESSION_FIELDS)
+    if proposed["contract_version"] == "feedback/v2":
+        expected_fields.update(("context", "observation", "repertoire_id"))
+    if set(proposed["event"]) != expected_fields:
+        raise ValueError("proposal event does not match version")
     if type(proposed["state_revision"]) is not int or proposed["state_revision"] < 0:
         raise ValueError("invalid state revision")
     _event(proposed["event"], catalog)
