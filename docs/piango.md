@@ -98,10 +98,14 @@ each phase boundary. The exporter gets every note and intended hand from
 the same versioned onset groups as the MIDI evaluator; neither PianGo nor
 MIDI can observe the actual fingers used.
 
-The chosen octaves, LH-rest interpretation during RH's return, and crossing
-landmarks are provisional, user-specific reference choices pending manual
-verification. Do not claim the current exercise notation is a validated
-reproduction of a teacher's technique or an Alfred arrangement.
+The five-phase score follows the clarified hand-motion rule: both hands
+return in phase 2 and phase 4, with no LH rest at any authored onset. It uses
+provisional LH C3 / RH C4 starting registers and **no inferred five-phase
+fingering annotations**. Only the independent two-octave crossing drill
+contains the player-reported LH 3-at-A3 and 4-at-D4 finger references.
+Physical starting registers and actual fingering remain subject to manual
+verification. Do not claim this original notation reproduces a teacher's
+technique or an Alfred arrangement.
 
 
 Normalized legacy exercises with unknown intended hand (`hands: [null]`)

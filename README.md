@@ -66,7 +66,7 @@ The [curriculum catalog](catalogs/curriculum.json) tracks goals beyond the initi
 - **Arpeggios:** practice C-major and A-minor broken chords through one and two octaves, identifying chord tones and thumb transfers.
 - **Two-hand scale choreography:** first establish parallel C-major scales with your reported LH finger-3 crossing in octave one and finger-4 crossing in octave two; then practice the five-phase parallel/reverse/contrary-motion pattern.
 
-The five-phase score is a **provisional authored realization** of your description, not proof of the exact registers you use. It starts LH C3 / RH C4; phase 2 makes the LH descend while RH continues upward and back (LH rests during the RH return). Confirm this interpretation against your physical routine before treating the reference fingering as canonical.
+The five-phase score is an **original, provisional C-major realization** with an assumed LH C3 / RH C4 starting register. Phases **2 and 4 both use contrary motion outward and both hands returning**; Phase 3 ascends and returns in parallel. This matches the clarified five-phase movement, but not an externally verified octave placement. The **separate two-octave crossing drill** retains your LH finger 3 (A3) / finger 4 (D4) references; no fingering is inferred or annotated for the five-phase exercise.
 
 Method references are **Alfred's Basic Adult Piano Course Levels One and Two**. Actual page progress, exercise names and privately owned scores stay in the local learner's notes; this public repository does not redistribute textbook material.
 
@@ -81,7 +81,7 @@ python3 -m piano_practice.cli notation --exercise reading-accidentals > local/re
 python3 -m piano_practice.cli notation --exercise minor-harmonic > local/minor-harmonic.musicxml
 ```
 
-You can also export the arpeggios and two-handed scale exercises as original PianGo MusicXML, including printed left-hand crossing cues:
+You can also export the arpeggios and two-handed scale exercises as original PianGo MusicXML. Printed left-hand crossing cues are **only** supplied for the separate two-octave drill:
 
 ```sh
 python3 -m piano_practice.cli export --target piango \
@@ -92,7 +92,7 @@ python3 -m piano_practice.cli export --target piango \
   > local/scale-crossings.musicxml
 
 python3 -m piano_practice.cli export --target piango \
-  --exercise scale-five-phase-opposing --fingering-reference \
+  --exercise scale-five-phase-opposing \
   > local/five-phase-scales.musicxml
 ```
 
