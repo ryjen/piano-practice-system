@@ -13,13 +13,13 @@ The player reports observations, not automated diagnostic conclusions. The plann
 
 ## Failure handling
 
-- A malformed proposal, altered content, wrong key, unknown exercise, duplicate/conflicting ID, missing file, or stale state revision fails without applying.
+- A malformed proposal, altered content, wrong key, unknown exercise, duplicate/conflicting ID, missing file, stale revision, or altered catalog/state content at the same revision fails without applying.
 - Reapplying an identical already-approved proposal reports `already-applied` without incrementing revision.
 - The write uses a POSIX `flock` sibling lock, a same-directory temporary file, `fsync`, `0600` permissions, and an atomic `os.replace`. Other tools manually modifying the same state without the lock are outside its concurrency guarantee.
-- The acknowledged SHA-256 content digest is **not a signature**; it demonstrates exact reviewed-byte intent only. There are no accounts, signatures, or trusted identities.
+- The acknowledged SHA-256 content digest is **not a signature**; it demonstrates exact reviewed-byte intent only. State and catalog digests bind the proposal to exact source content, including edits that fail to increment a revision. There are no accounts, signatures, or trusted identities.
 - Do not publish `local/` state or raw keyboard captures. All public fixtures remain synthetic.
 - An approved feedback record is not a formal `maintained` or `reliable-context` promotion. Dedicated competency assessment and maintenance rules remain separate future work.
 
 ## Deliberate limitations
 
-This version is POSIX-only due to `fcntl.flock`. It is a single-user reference implementation, not a hosted service or distributed database. MIDI timing and velocity cannot prove physical comfort or fingering. A `passed: true` result is explicitly attributed to the player. The pipeline does not silently import automatic assessment results as self-report.
+The write/approval operation is POSIX-only due to `fcntl.flock`; read-only planning and MIDI grading are portable. It is a single-user reference implementation, not a hosted service or distributed database. MIDI timing and velocity cannot prove physical comfort or fingering. A `passed: true` result is explicitly attributed to the player. The pipeline does not silently import automatic assessment results as self-report.

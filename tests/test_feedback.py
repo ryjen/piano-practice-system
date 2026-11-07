@@ -69,6 +69,27 @@ class FeedbackLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "conflicting feedback event id"):
             apply(self.path, self.catalog, other, other["approval_key"])
 
+    def test_state_content_change_without_revision_fails_closed(self):
+        p = self.propose()
+        current = load_state(self.path)
+        current["extra_manual_edit"] = "someone edited this without incrementing revision"
+        self.path.write_text(json.dumps(current), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "state changed without revision"):
+            apply(self.path, self.catalog, p, p["approval_key"])
+        self.assertEqual(load_state(self.path)["revision"], 0)
+
+    def test_catalog_change_rejected(self):
+        p = self.propose()
+        changed = json.loads(json.dumps(self.catalog))
+        changed["exercises"][0]["title"] = "changed title"
+        with self.assertRaisesRegex(ValueError, "catalog changed"):
+            apply(self.path, changed, p, p["approval_key"])
+        self.assertEqual(load_state(self.path)["revision"], 0)
+
+    def test_unhashable_evidence_ref_rejected_cleanly(self):
+        with self.assertRaisesRegex(ValueError, "invalid evidence reference"):
+            self.propose(evidence_refs=[{"not": "a path"}])
+
     def test_mutated_proposal_is_rejected(self):
         p = self.propose()
         p["event"]["passed"] = False

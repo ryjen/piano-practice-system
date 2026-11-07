@@ -5,7 +5,6 @@ Only a deliberate apply call can persist an approved feedback event.
 """
 from __future__ import annotations
 
-import fcntl
 import hashlib
 import json
 import os
@@ -13,6 +12,11 @@ from pathlib import Path, PurePosixPath
 import re
 import tempfile
 from datetime import date
+
+try:
+    import fcntl
+except ImportError:  # The read-only planner remains usable on Windows.
+    fcntl = None
 
 from .core import COMFORT, FEEDBACK, validate_catalog, validate_state
 
@@ -51,14 +55,14 @@ def _event(event: dict, catalog: dict) -> None:
     refs = event["evidence_refs"]
     if not isinstance(refs, list) or len(refs) > 16:
         raise ValueError("invalid evidence references")
-    if len(refs) != len(set(refs)):
-        raise ValueError("duplicate evidence reference")
     for ref in refs:
         if not isinstance(ref, str) or not 1 <= len(ref) <= 256:
             raise ValueError("invalid evidence reference")
         p = PurePosixPath(ref)
         if p.is_absolute() or ".." in p.parts or "\\" in ref or ":" in ref:
             raise ValueError("evidence reference must be a safe, relative local path")
+    if len(refs) != len(set(refs)):
+        raise ValueError("duplicate evidence reference")
 
 
 def proposal(catalog: dict, state: dict, *, event_id: str, on_date: str,
@@ -70,14 +74,20 @@ def proposal(catalog: dict, state: dict, *, event_id: str, on_date: str,
                  feedback=feedback, comfort=comfort, passed=passed,
                  realized_bpm=realized_bpm, evidence_refs=list(evidence_refs or []))
     _event(event, catalog)
-    bare = dict(record_type="feedback-proposal", contract_version="feedback/v1",
-                state_revision=state["revision"], event=event)
+    bare = dict(
+        record_type="feedback-proposal", contract_version="feedback/v1",
+        state_revision=state["revision"],
+        state_digest="sha256:" + hashlib.sha256(canonical(state)).hexdigest(),
+        catalog_digest="sha256:" + hashlib.sha256(canonical(catalog)).hexdigest(),
+        event=event
+    )
     return {**bare, "approval_key": "sha256:" + hashlib.sha256(canonical(bare)).hexdigest()}
 
 
 def _validate_proposal(proposed: dict, catalog: dict) -> str:
     if not isinstance(proposed, dict) or set(proposed) != {
-        "record_type", "contract_version", "state_revision", "event", "approval_key"
+        "record_type", "contract_version", "state_revision", "state_digest",
+        "catalog_digest", "event", "approval_key"
     }:
         raise ValueError("invalid feedback proposal")
     if proposed["record_type"] != "feedback-proposal" or proposed["contract_version"] != "feedback/v1":
@@ -85,6 +95,8 @@ def _validate_proposal(proposed: dict, catalog: dict) -> str:
     if type(proposed["state_revision"]) is not int or proposed["state_revision"] < 0:
         raise ValueError("invalid state revision")
     _event(proposed["event"], catalog)
+    if proposed["catalog_digest"] != "sha256:" + hashlib.sha256(canonical(catalog)).hexdigest():
+        raise ValueError("catalog changed since feedback proposal")
     bare = {k: v for k, v in proposed.items() if k != "approval_key"}
     expected = "sha256:" + hashlib.sha256(canonical(bare)).hexdigest()
     if proposed["approval_key"] != expected:
@@ -101,6 +113,8 @@ def apply(path: Path | str, catalog: dict, proposed: dict, acknowledged_key: str
     expected = _validate_proposal(proposed, catalog)
     if acknowledged_key != expected:
         raise ValueError("approval key does not match reviewed proposal")
+    if fcntl is None:
+        raise RuntimeError("feedback apply requires POSIX fcntl locking (Linux/macOS)")
     target = Path(path)
     if target.is_symlink() or not target.is_file():
         raise ValueError("state must be an existing regular non-symlink file")
@@ -124,6 +138,9 @@ def apply(path: Path | str, catalog: dict, proposed: dict, acknowledged_key: str
             raise ValueError("conflicting feedback event id")
         if proposed["state_revision"] != state["revision"]:
             raise ValueError("stale state revision; generate a new proposal")
+        digest = "sha256:" + hashlib.sha256(canonical(state)).hexdigest()
+        if proposed["state_digest"] != digest:
+            raise ValueError("state changed without revision update; generate a new proposal")
         # Existing records without IDs remain readable for compatibility.
         updated = dict(state)
         updated["revision"] = state["revision"] + 1
