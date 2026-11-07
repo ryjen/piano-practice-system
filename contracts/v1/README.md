@@ -18,6 +18,7 @@ Contracts are local-first and machine-readable JSON. Preserve compatibility by a
 | `progression/v1` | `pianoctl progression evaluate/apply` | Bounded multi-session gate proposal and distinct explicit approval; one-step regression and maintained-state maintenance queue |
 | `midi-trace-inspection/v1` | `pianoctl hardware <take>` | Structural diagnostic from provided MIDI bytes; **never physical device attestation** |
 | Original MusicXML | `pianoctl notation --exercise ...` | Original single-staff exercise generated from public note sequences; no imported Alfred notation |
+| PianGo MusicXML | `pianoctl export --target piango --exercise ...` | Deterministic original-score export of all 18 catalog drills; model-specific two-hand timelines, authored enharmonic spellings, optional *illustrative* printed fingerings. Import and observed technique remain unverified |
 
 ## Authority, integrity and uncertainty
 
