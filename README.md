@@ -50,14 +50,39 @@ Create `local/` first. Select the *note* USB MIDI port, not the DAW transport/co
 
 Each proposed session has **one technique**, one bounded exercise, and one self-check. The planner rotates among three approachable foundational techniques and advances a technique only after two approved passing sessions on separate dates, with a comfortable self-report. If difficulty or tension is explicitly reported, it repeats at a reduced tempo. Absent history is unknown, not assumed novice proficiency or mastery.
 
-Public examples are synthetic. For actual practice, copy `examples/learner-state.json` to `local/learner-state.json`; update it intentionally after reviewing each take and self-report. The tool does not silently modify that file.
+Public examples are synthetic. For actual practice, copy `examples/learner-state.json` to `local/learner-state.json` and set permissions to `0600`. Only the explicit `feedback apply` command updates approved history; proposals and MIDI assessments are read-only. See [feedback approval](docs/feedback.md).
+
+## Completing the feedback loop
+
+```sh
+mkdir -p local
+cp examples/learner-state.json local/learner-state.json
+chmod 600 local/learner-state.json
+
+python3 -m piano_practice.cli feedback propose \
+  --state local/learner-state.json \
+  --id pulse-nov10-session1 --date 2026-11-10 --exercise pulse-quarter \
+  --feedback appropriate --comfort comfortable --passed yes --bpm 60 \
+  > local/proposal.json
+
+# Review local/proposal.json before accepting it.
+# Substitute the exact approval_key printed in that proposal:
+python3 -m piano_practice.cli feedback apply local/proposal.json \
+  --state local/learner-state.json --acknowledge 'sha256:THE_PROPOSAL_KEY'
+
+python3 -m piano_practice.cli plan --date 2026-11-12 \
+  --state local/learner-state.json
+```
+
+The approval key is a content acknowledgement, not an authentication signature.
+Automatic MIDI grading never sets `--passed` for you.
 
 ## Boundaries
 
 - MIDI can confirm note numbers, onset spacing relative to one another, relative key velocity, and note-on/off pairing. It **cannot** establish fingering, posture, muscle tension, hand identity, sound quality, or click-phase alignment.
 - Oxygen Smart Chord, Smart Scale, Note Repeat, zones, octave shift, and arpeggiator may transform observable MIDI. Disable or explicitly document these modes for ordinary assessment.
 - Keep personal practice logs and captured data in ignored `local/`; public catalog and fixtures must be synthetic and redistributable.
-- Proposals are read-only; neither a test pass nor optional automation may alter canonical state without human approval.
+- Session proposals, feedback proposals, and MIDI assessment are read-only; only the explicit reviewed `feedback apply` step updates approved history. This does not promote canonical mastery state.
 - This repository does not implement AI systems or host personal data. It follows the guitar public-core separation of concerns without copying that codebase.
 
 See [architecture](docs/architecture.md), [hardware setup](docs/hardware/oxygen-pro-61.md), [roadmap](docs/roadmap.md), and [data contracts](contracts/v1/README.md).
