@@ -362,4 +362,8 @@ def maintenance_due(catalog: dict, state: dict, as_of: str, interval_days: int) 
                 "due_date": due_on.isoformat(), "overdue_days": max(0, (day-due_on).days),
                 "reason": "adverse-feedback" if needs_recovery else "maintenance-due"
             })
-    return sorted(results, key=lambda item: (item["due_date"], item["technique_id"]))
+    # An explicitly adverse report is a recovery obligation; it must not be
+    # hidden behind a chronologically older but routine maintenance reminder.
+    return sorted(results, key=lambda item: (
+        item["reason"] != "adverse-feedback", item["due_date"], item["technique_id"]
+    ))
