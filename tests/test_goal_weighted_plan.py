@@ -78,7 +78,12 @@ class WeightedPracticePlanTests(unittest.TestCase):
         self.assertEqual(len(first["selection"]["candidate_scores"]), 11)
         self.assertEqual([s["technique_id"] for s in first["warmups_within_prepare"]],
                          ["reading", "coordination"])
-        self.assertEqual(sum(s["minutes"] for s in first["warmups_within_prepare"]), 2)
+        self.assertEqual(sum(s["minutes"] for s in first["warmups_within_prepare"]), 3)
+        self.assertEqual(first["warmups_within_prepare"][0]["minutes"], 2)
+        self.assertEqual(self.config["goal_weights"]["reading"], 5)
+        self.assertGreater(self.config["goal_weights"]["reading"],
+                           max(w for t, w in self.config["goal_weights"].items()
+                               if t != "reading"))
         self.assertEqual(sum(s["minutes"] for s in first["stages"]), 20)
 
     def test_manual_focus_override_and_bad_focus_fail_closed(self):
@@ -91,6 +96,26 @@ class WeightedPracticePlanTests(unittest.TestCase):
             propose(self.catalog, self.state, self.config,
                     "2026-11-10", focus_override="nonexistent")
         self.assertEqual(self.state["revision"], 0)
+
+    def test_reading_first_warmups_fit_all_supported_session_durations(self):
+        expected = {15: [1, 1], 20: [2, 1], 30: [2, 1]}
+        for duration, amounts in expected.items():
+            with self.subTest(duration=duration):
+                config = copy.deepcopy(self.config)
+                config["duration_minutes"] = duration
+                plan = propose(self.catalog, self.state, config, "2026-11-10")
+                prepare = plan["stages"][0]["minutes"]
+                rows = plan["warmups_within_prepare"]
+                self.assertEqual([x["minutes"] for x in rows], amounts)
+                self.assertLessEqual(sum(amounts), prepare)
+                self.assertEqual(sum(x["minutes"] for x in plan["stages"]), duration)
+
+    def test_invalid_short_session_override_fails_closed(self):
+        config = copy.deepcopy(self.config)
+        config["duration_minutes"] = 15
+        config["warmups_by_duration"]["15"][0]["minutes"] = 2
+        with self.assertRaisesRegex(ValueError, "exceed"):
+            propose(self.catalog, self.state, config, "2026-11-10")
 
     def test_invalid_weights_and_warmups_rejected(self):
         for problem in (

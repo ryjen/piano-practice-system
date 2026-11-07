@@ -40,3 +40,26 @@ The clarified five-phase movement is represented in C major, including **both-ha
 ### Goal-weighted planner (software)
 
 An optional bounded `goal_weights` map is evaluated against approved session recency. The planner remains read-only and returns an inspectable score/rationale, uses in-budget reading/coordination warm-ups, accepts an explicit `--focus` override with a deferred-recovery warning, and replays private reviewed Alfred/repertoire checkpoints without claiming completion. Legacy config without weights still rotates by least recent technique. All dates remain injected rather than relying on clock/network state.
+
+### Next user-priority milestone: keyboard-driven sight reading
+
+The primary goal is to **read an unfamiliar note or phrase from the staff
+and find it on the connected keyboard**, receiving immediate MIDI pitch
+feedback without answer-revealing labels. The current repo has only fixed
+notation examples and retrospective MIDI assessment; it does not implement
+a live staff-reading practice loop. Keep this as a separately qualified
+interactive feature with no hardware-pass claim until physical evidence
+exists. See `docs/reading.md` and the dedicated GitHub issue.
+
+Teacher-guided chord work now includes a small, comfortable wrist movement
+cue, with credit to Shirly Mann; this is not an auto-assessed biomechanical
+claim.
+
+### Optional DAW environments
+
+The piano-practice system will support a DAW-agnostic reading input contract,
+with **REAPER for Linux** and **GarageBand for macOS** as candidate local sound,
+metronome, and recording environments. No DAW API, plugin or private recording
+is required for note identification. Concurrent MIDI port routing, octave
+calibration, CC64 and physical-keyboard/DAW parity remain issue #2
+acceptance work; see `docs/daw-routing.md`.

@@ -66,8 +66,16 @@ def weighted_focus(techniques: list[str], active: list[dict],
 
 
 def warmups_for_prepare(config: dict, allowed: set[str],
-                        prepare_minutes: int) -> list[dict]:
-    rows = config.get("warmups", [])
+                        prepare_minutes: int,
+                        session_minutes: int | None = None) -> list[dict]:
+    # A shorter session may choose an explicit alternative warmup schedule.
+    # Never silently shorten/drop user-authored prompts to fit an allocation.
+    overrides = config.get("warmups_by_duration", {})
+    if not isinstance(overrides, dict) or any(
+        key not in {"15", "20", "30"} for key in overrides
+    ):
+        raise ValueError("invalid warmup duration overrides")
+    rows = overrides.get(str(session_minutes), config.get("warmups", []))
     if not isinstance(rows, list) or len(rows) > 4:
         raise ValueError("warmups must be a list of at most four entries")
     seen = set()

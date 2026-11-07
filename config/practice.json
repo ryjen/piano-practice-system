@@ -22,7 +22,7 @@
   ],
   "maintenance_interval_days": 14,
   "goal_weights": {
-    "reading": 4,
+    "reading": 5,
     "coordination": 4,
     "scale-patterns": 3,
     "arpeggios": 3,
@@ -37,13 +37,27 @@
   "warmups": [
     {
       "technique_id": "reading",
-      "minutes": 1,
-      "prompt": "Name three written notes and one rhythm before playing."
+      "minutes": 2,
+      "prompt": "Sight-read an unseen staff note or short fragment, then find its key; avoid showing letter names first."
     },
     {
       "technique_id": "coordination",
       "minutes": 1,
       "prompt": "Slowly align one LH/RH entry and release; monitor comfort."
     }
-  ]
+  ],
+  "warmups_by_duration": {
+    "15": [
+      {
+        "technique_id": "reading",
+        "minutes": 1,
+        "prompt": "Cold-read an unseen staff note; find it on the keyboard without revealing the name."
+      },
+      {
+        "technique_id": "coordination",
+        "minutes": 1,
+        "prompt": "Align one relaxed left/right-hand entry and release."
+      }
+    ]
+  }
 }

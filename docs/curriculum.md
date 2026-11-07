@@ -2,6 +2,22 @@
 
 Practice scope includes staff reading, hands-together coordination, the circle of fourths/fifths, major and minor triads, natural/harmonic minor and accidentals, four-note chords, arpeggios, and two-hand parallel/contrary-motion scale patterns. These are separate technique targets with explicit progress; songs are **application contexts**, not prerequisites or proof of mastery.
 
+## Reading-first instruction and teaching attribution
+
+**Primary learning objective:** becoming fluent at reading the printed grand staff
+and translating unfamiliar notation into keyboard actions, rather than recognizing
+memorized exercise patterns or only guessing note names on a watch. A genuine
+reading check should conceal note-name and highlighted-key hints until after
+the first played MIDI answer; see [reading-first practice](reading.md).
+
+**Teacher acknowledgement:** piano teacher **Shirly Mann** has contributed
+instructional guidance on some of the user's practice techniques and method-book
+selections, including a reminder to use a *little comfortable wrist movement
+on chords* rather than playing with a locked wrist. This is an acknowledgement of
+lessons and learning influences, not an assertion that the teacher wrote,
+approved or endorsed this software. Chord technique is self/teacher-observed:
+MIDI event data cannot evaluate wrist motion, finger mechanics, or discomfort.
+
 ## Method-book checkpoints
 
 - **Alfred's Basic Adult Piano Course — Level One**: reference only; the user's physical or licensed score is authoritative for pages, pacing, notation, and drills.
