@@ -1,15 +1,34 @@
-# Exchange contracts v1
+# Piano practice contracts
 
-The public JSON contracts and their semantics are stable for this reference slice.
+Contracts are local-first and machine-readable JSON. Preserve compatibility by adding versioned contracts instead of silently changing existing meanings.
 
-- `catalogs/exercises.json`: `schema_version: 1`; entries have stable `id`, `technique_id`, `level` (0/1), `title`, `notes` (MIDI integers), `bpm`, `subdivision` (1/2 events per quarter note), optional `dynamics: alternate`, instructions, and self-check.
-- `config/practice.json`: explicit timezone and preference, duration 15/20/30, ordered technique IDs. Preferred days/time are only metadata; no background scheduler is installed.
-- `examples/learner-state.json`: `schema_version: 1`, monotonically increased `revision`, and `sessions` entries. Each session requires `date`, `exercise_id`, `feedback` (`easy|appropriate|hard`), `comfort` (`comfortable|tension|unknown`), `passed` (`true|false|null`), and explicit `approved` boolean.
-- `midi-take/v1`: `exercise_id`, `events` with relative monotonic `t_ms`, MIDI channel 0–15; note-on/off includes pitch 0–127 and velocity 0–127; CC64 uses `control:64,value:0..127`. A zero-velocity note-on is semantically a note-off.
-- `session/v1`: advisory proposal with a state revision, realization, stages, safety and provenance fields. Never treated as an approved schedule.
-- `feedback/v1`: read-only feedback proposal with explicit user-entered event ID, date, exercise, realized tempo, subjective difficulty, comfort and passed/failed/unknown self-report, optional relative evidence paths, source `state_revision`, source-state and catalog SHA-256 digests, and a SHA-256 content acknowledgement key. Only an explicit `feedback apply` with the exact key may append an approved record. State revision increments by one, stale proposals fail closed, exact retries are idempotent, and conflicting event IDs are rejected under an OS-level POSIX lock.
-- `assessment/v1`: advisory per-check outcomes `pass|fail|unknown|not-applicable`, diagnostic numbers and known limitations; **not** a canonical learning-state event.
+## Core records
 
-Absence of a MIDI take means not measured; absence of physical self-report means comfort unknown. Neither implies failure or success. The `passed` field in an approved feedback event is a **reviewed player observation**, not evidence of fingering, physical technique or objective mastery. Hash acknowledgement is not a cryptographic signature or multiuser authorization. The local ledger is POSIX-only (Linux/macOS), with atomic same-directory state replacement and restrictive output permissions.
+| Contract | Source | Semantic boundary |
+| --- | --- | --- |
+| `catalog/v1` | `catalogs/exercises.json` | Stable exercise ID, technique, level (0/1), MIDI note sequence, tempo, subdivision, instructions, self-check; optional `assessment_mode: human` prevents MIDI-only pass claims |
+| `curriculum/v1` | `catalogs/curriculum.json` | Method-book references, technique goals, recital **metadata** only; no text/notation from copyrighted materials |
+| `practice-config/v1` | `config/practice.json` | IANA timezone, preferred days/time, focus order, 15/20/30-minute session size, maintained-state verification interval; **not a notification service** |
+| `state/v1` | `examples/learner-state.json` | Revision, approved feedback sessions, optional append-only approved `progression_events`; real state belongs in ignored `local/` |
+| `session/v1` | `pianoctl plan` | Read-only deterministic session proposal bound to source state revision |
+| `midi-take/v1` | `pianoctl capture` | Timestamped MIDI note-on/off and sustain CC64, MIDI channel, pitch and velocity; no audio or finger identity |
+| `assessment/v1` | `pianoctl assess` | Relative onset/pitch/release/dynamics evidence, not mastery; manual-requirement returns `unknown` for physical/reading techniques |
+| `feedback/v1` | `pianoctl feedback propose` (without context) | Historical reviewed self-report record; valid for schedule history, **ineligible** for context-specific competency gates |
+| `feedback/v2` | `pianoctl feedback propose --context ...` | Explicit `isolation` or `musical-context`, named IANA `timezone`, human `observation`, optional `repertoire_id`, `method_book_id` and private `method_checkpoint`, source-state and catalog digests, content acknowledgement |
+| `progression/v1` | `pianoctl progression evaluate/apply` | Bounded multi-session gate proposal and distinct explicit approval; one-step regression and maintained-state maintenance queue |
+| `midi-trace-inspection/v1` | `pianoctl hardware <take>` | Structural diagnostic from provided MIDI bytes; **never physical device attestation** |
+| Original MusicXML | `pianoctl notation --exercise ...` | Original single-staff exercise generated from public note sequences; no imported Alfred notation |
 
-No scheduler-generated date or extra device events are treated as evidence. JSON fixtures are synthetic. Stable IDs must not be reused for semantically different exercises. For v2 changes, add a version and fixtures rather than silently changing v1 behavior.
+## Authority, integrity and uncertainty
+
+The state moves only through explicit, reviewed `feedback apply` or `progression apply` operations, never through `plan`, MIDI scores, or calendar metadata. Each accepted event increments a state revision; exact repeated proposals are idempotent, and stale/conflicting event IDs or altered source contents are rejected. Separate writers must honor the same POSIX sidecar lock. SHA-256 acknowledgement keys bind reviewed *content*, **not user authentication/signature or multi-user authorization**.
+
+`feedback/v2` is required to establish isolation/musical-context competency gates. The player supplies difficulty/comfort and whether the task was accomplished; a MIDI result cannot supply fingering, staff comprehension, hand identity, physical comfort or acoustic performance. Missing evidence remains `unknown` or `blocked`, not guessed.
+
+Each approved feedback/v2 and progression event carries its `applied_revision` so an adverse report added after a transition on the same calendar date is still available for recovery checks. Same-day positive evidence does not count as a new independent practice date. Exact-event replays must match the original append revision.
+
+Technique states: `discovered → developing → reliable-isolation → reliable-context → maintained`. Reviewable lifecycle states `paused` and `retired` are vocabulary only, not part of the v1 transition writer. A one-step regression needs explicit adverse evidence. Positive gate requirements are based on distinct approved practice dates after the previous transition and latest adverse feedback. An explicitly `hard` report cannot support a positive gate, even when the player also reports `passed=true`. Applying a historical proposal refuses backdating behind later approved practice observations for the same technique.
+
+The content catalogs are intended as public synthetic/reference resources. Actual practice history, recordings, MIDI takes, and score page tracking are private and ignored under `local/`. Do not ship copyrighted method-book material into either public fixtures or generated files.
+
+See [progression semantics](../../docs/progression.md), [curriculum references](../../docs/curriculum.md), and [Oxygen Pro 61 qualification](../../docs/hardware/qualification.md).

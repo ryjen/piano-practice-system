@@ -34,6 +34,8 @@ def validate_catalog(catalog: dict) -> None:
             raise ValueError("subdivision must be 1 or 2")
         if ex.get("dynamics") not in (None, "alternate"):
             raise ValueError("unsupported dynamics gate")
+        if ex.get("assessment_mode", "midi") not in ("midi", "human"):
+            raise ValueError("unknown assessment mode")
 
 
 def validate_state(state: dict, catalog: dict) -> None:
@@ -78,6 +80,14 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         history = [s for s in active if by_id[s["exercise_id"]]["technique_id"] == technique]
         last_by_technique[technique] = max((s["date"] for s in history), default="")
     focus = min(techniques, key=lambda t: (last_by_technique[t], techniques.index(t)))
+    due = []
+    if state.get("progression_events"):
+        from .progression import maintenance_due
+        due = maintenance_due(
+            catalog, state, on_date, config.get("maintenance_interval_days", 14)
+        )
+    if due:
+        focus = due[0]["technique_id"]
     choices = sorted((e for e in catalog["exercises"] if e["technique_id"] == focus),
                      key=lambda e: (e["level"], e["id"]))
     foundation = [e for e in choices if e["level"] == 0]
@@ -100,7 +110,15 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         or latest_foundation["comfort"] == "tension"
         or latest_foundation["passed"] is False
     )
-    exercise = advanced[0] if len(successful_dates) >= 2 and not regression_signal else foundation
+    maintenance_recovery = bool(due and due[0].get("reason") == "adverse-feedback")
+    # Recovery always outranks ordinary advancement, even when historical
+    # foundation successes would otherwise select the advanced exercise.
+    if maintenance_recovery:
+        exercise = foundation
+    elif (len(successful_dates) >= 2 and not regression_signal) or due:
+        exercise = advanced[0]
+    else:
+        exercise = foundation
     recent = sorted(
         (s for s in active if s["exercise_id"] == exercise["id"]),
         key=lambda s: s["date"]
@@ -114,6 +132,12 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
             rationale = "recent explicit difficulty: simplify tempo without advancing"
         else:
             rationale = "rotated technique using approved feedback and practice history"
+    if due:
+        rationale = (
+            "approved maintenance recovery required"
+            if maintenance_recovery else
+            "approved maintenance verification due: " + due[0]["due_date"]
+        )
     minutes = config["duration_minutes"]
     if minutes not in (15, 20, 30):
         raise ValueError("duration_minutes must be 15, 20, or 30")

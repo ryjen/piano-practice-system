@@ -16,6 +16,13 @@ class PlannerTests(unittest.TestCase):
     def setUp(self):
         self.catalog = load("catalogs/exercises.json")
         self.config = load("config/practice.json")
+        # Legacy three-technique fixtures stay focused on the original slice;
+        # the expanded curriculum receives independent regression coverage.
+        self.catalog["exercises"] = [
+            e for e in self.catalog["exercises"]
+            if e["technique_id"] in ("pulse", "navigation", "dynamics")
+        ]
+        self.config["technique_order"] = ["pulse", "navigation", "dynamics"]
         self.state = load("examples/learner-state.json")
 
     def add(self, date, exercise, feedback="appropriate", passed=True,

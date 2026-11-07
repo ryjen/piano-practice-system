@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "source_policy": "Only metadata and user's own annotations; do not embed copyrighted Alfred exercises or arrangements.",
+  "method_books": [
+    {
+      "id": "alfred-basic-adult-1",
+      "title": "Alfred's Basic Adult Piano Course — Level One",
+      "type": "method",
+      "edition": "unspecified",
+      "notes": "User-owned book; page and exercise checkpoints are private learner notes."
+    },
+    {
+      "id": "alfred-basic-adult-2",
+      "title": "Alfred's Basic Adult Piano Course — Level Two",
+      "type": "method",
+      "edition": "unspecified",
+      "notes": "Use after relevant Level One checkpoints; avoid assuming completion or ability."
+    }
+  ],
+  "practice_goals": [
+    {
+      "id": "read-sheet-music",
+      "technique_id": "reading",
+      "intent": "Decode staff pitches, rhythm, and accidentals before playing by pattern memory",
+      "method_book_ids": [
+        "alfred-basic-adult-1",
+        "alfred-basic-adult-2"
+      ]
+    },
+    {
+      "id": "hands-together",
+      "technique_id": "coordination",
+      "intent": "Maintain independent pulse and release in two hands",
+      "method_book_ids": [
+        "alfred-basic-adult-1",
+        "alfred-basic-adult-2"
+      ]
+    },
+    {
+      "id": "cycle-fourths-fifths",
+      "technique_id": "circle",
+      "intent": "Navigate keys and understand key signatures rather than rote key travel",
+      "method_book_ids": []
+    },
+    {
+      "id": "triads",
+      "technique_id": "triads",
+      "intent": "Build major/minor triads and inversions",
+      "method_book_ids": [
+        "alfred-basic-adult-1",
+        "alfred-basic-adult-2"
+      ]
+    },
+    {
+      "id": "minor-accidentals",
+      "technique_id": "minor",
+      "intent": "Understand natural/harmonic minor and accidental notation",
+      "method_book_ids": [
+        "alfred-basic-adult-1",
+        "alfred-basic-adult-2"
+      ]
+    },
+    {
+      "id": "four-note-harmony",
+      "technique_id": "four-note",
+      "intent": "Build four-note chords and voice-leading without excessive reach",
+      "method_book_ids": [
+        "alfred-basic-adult-2"
+      ]
+    }
+  ],
+  "repertoire": [
+    {
+      "id": "fur-elise",
+      "title": "Für Elise",
+      "composer": "Ludwig van Beethoven",
+      "role": "recital-candidate",
+      "arrangement": "user score/edition unspecified",
+      "source_reference": null,
+      "focus_techniques": [
+        "reading",
+        "coordination",
+        "minor"
+      ],
+      "rights": "The original composition is public-domain; exact edition/arrangement must be checked before redistribution."
+    },
+    {
+      "id": "over-the-rainbow",
+      "title": "Over the Rainbow",
+      "composer": "Harold Arlen",
+      "role": "recital-candidate",
+      "arrangement": "Alfred Level One (user reference; exact edition and page unspecified)",
+      "source_reference": "alfred-basic-adult-1",
+      "focus_techniques": [
+        "reading",
+        "coordination",
+        "triads"
+      ],
+      "rights": "Copyrighted composition/arrangement: store metadata and personal section checkpoints only, not sheet music or note-by-note transcription."
+    },
+    {
+      "id": "jacobs-ladder",
+      "title": "Jacob's Ladder",
+      "composer": "traditional / arrangement unspecified",
+      "role": "recital-candidate",
+      "arrangement": "user score/edition unspecified",
+      "source_reference": null,
+      "focus_techniques": [
+        "reading",
+        "coordination",
+        "triads"
+      ],
+      "rights": "Rights for the specific arrangement are unknown; do not commit its score."
+    }
+  ]
+}

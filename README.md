@@ -11,12 +11,16 @@ Practice is useful without a MIDI keyboard, DAW, song library, AI provider, clou
 | Capability | Status |
 | --- | --- |
 | Reproducible session proposals, one technique and one self-check | Implemented |
-| Pulse, keyboard navigation, and dynamics (two levels each) | Implemented |
+| Nine technique areas: reading, hands together, minor/accidentals, triads, circle of fourths/fifths, four-note chords, pulse, keyboard navigation, dynamics | Implemented (two levels each) |
 | Conservative rotation from approved history and explicit feedback | Implemented |
 | 15-, 20-, or 30-minute sessions, with a 5-minute fallback | Implemented |
 | USB MIDI port listing and bounded note/CC64 capture | Implemented, **hardware not qualified** |
 | Pitch, relative onset timing, release-pairing, and relative velocity checks | Implemented, advisory |
 | Human-reviewed, revision-safe feedback application | Implemented, explicit approval required |
+| Context-bound feedback/v2 and separate progression gates | Implemented, explicit approval required |
+| MusicXML export of original reading and minor-key exercises | Implemented |
+| Alfred Level 1–2 and recital metadata catalog | Implemented (references only) |
+| Maintenance-due proposals from approved practice | Implemented |
 | Automatic mastery promotion, synchronized metronome, synthesis, UI, calendar notifications | Not implemented |
 
 The preferred Tuesday/Thursday evening cadence is recorded in [config/practice.json](config/practice.json) (`America/Vancouver`, 19:00, 20 minutes). **It does not create notifications or calendar events.** Invoke the planner for a specific date.
@@ -44,7 +48,33 @@ flowchart LR
     Approve -->|No| Plan
 ```
 
-The long-term progression vocabulary is `discovered → developing → reliable-isolation → reliable-context → maintained`; `paused` and `retired` are separate lifecycle states. The current planner may suggest a next-level exercise after **two distinct, approved, comfortable successful foundation sessions**. That is **not** a formal mastery-state promotion.
+The competency progression vocabulary is `discovered → developing → reliable-isolation → reliable-context → maintained`; `paused` and `retired` are separate lifecycle states. The planner may suggest a next-level exercise after **two distinct, approved, comfortable successful foundation sessions**. Separately, the `progression` command evaluates context-bound evidence and proposes explicitly approved competency-state transitions; MIDI scores alone never promote a technique.
+
+## Curriculum and recital context
+
+The [curriculum catalog](catalogs/curriculum.json) tracks goals beyond the initial timing drills:
+
+- **Sheet reading:** decode notes and accidentals from the printed staff, not just memorize key positions.
+- **Two-handed coordination:** build independence and simultaneous entries; MIDI cannot establish which hand played.
+- **Circle of fourths/fifths:** navigate key relationships, key signatures, and root locations.
+- **Triads:** major/minor construction, inversions, and voice leading.
+- **Minor keys and accidentals:** natural vs harmonic minor, altered notes, and proper notation.
+- **Four-note chords:** build and voice lead Cmaj7, Am7, and related seventh-chord structures.
+
+Method references are **Alfred's Basic Adult Piano Course Levels One and Two**. Actual page progress, exercise names and privately owned scores stay in the local learner's notes; this public repository does not redistribute textbook material.
+
+Three recital candidates are tracked as metadata: **Für Elise**, **Over the Rainbow** (user's Alfred Level One version), and **Jacob's Ladder**. Their relevant techniques are associated with those pieces, but neither song completion nor perfect MIDI playback substitutes for specific reading or coordination evidence. Arrangement and edition details remain unknown where not provided.
+
+Generate original notation for selected staff-reading and minor-key exercises, then import the MusicXML into MuseScore or another compatible score editor:
+
+```sh
+mkdir -p local
+python3 -m piano_practice.cli notation --exercise reading-staff-steps > local/reading-staff.musicxml
+python3 -m piano_practice.cli notation --exercise reading-accidentals > local/reading-accidentals.musicxml
+python3 -m piano_practice.cli notation --exercise minor-harmonic > local/minor-harmonic.musicxml
+```
+
+The generated examples are original, single-staff note-reading material. They do **not** generate or copy editions of the named recital pieces, and they do not assess hands-together performance automatically. See [curriculum and recital planning](docs/curriculum.md).
 
 ## Quick start — no keyboard required
 
@@ -99,9 +129,14 @@ pianoctl capture \
   > local/pulse-take.json
 
 pianoctl assess local/pulse-take.json
+
+# Inspect the trace without making a hardware-qualification claim
+pianoctl hardware local/pulse-take.json
 ```
 
 The catalog uses MIDI note numbers: **60 is middle C**, regardless of whether the DAW displays C3 or C4. The recorded tempo is **declared**, not independently measured against a click. Capture records MIDI notes and sustain CC64, not audio. [Detailed device guidance](docs/hardware/oxygen-pro-61.md) and [hardware qualification task](https://github.com/ryjen/piano-practice-system/issues/2).
+
+**Physical qualification:** the connected remote development container currently has no `/dev/snd` access. USB-MIDI compatibility has not been established on the actual Oxygen Pro 61. Follow the [qualification checklist](docs/hardware/qualification.md) and keep issue #2 open until real-device evidence exists.
 
 **Interpretation limit:** relative onset spacing must be within `min(120 ms, 25% of the target interval)` and alternating-dynamics exercises must rise *and* fall in MIDI velocity by the declared contrast. Neither check establishes expressive timing, acoustic loudness, fingering, or comfort.
 
@@ -133,9 +168,43 @@ pianoctl plan --date 2026-11-12 --state local/learner-state.json
 
 This apply operation rejects stale revisions, modified state/catalog content, and conflicting event IDs; exact retry is idempotent. The SHA-256 acknowledgement is **not a digital signature or user authentication**. Approvals use POSIX file locking and atomic replacement (Linux/macOS), and should not be run concurrently with editors that ignore the lock. See [feedback semantics](docs/feedback.md).
 
+## Explicit competency and maintenance progression
+
+New `feedback/v2` records include an explicit IANA timezone (`America/Vancouver` by default), practice context (`isolation` or `musical-context`), human-authored observation, and optional recital or Alfred method-book checkpoint references. For a real session, add these parameters to `feedback propose`:
+
+```sh
+pianoctl feedback propose \
+  --state local/learner-state.json \
+  --id reading-nov10-1 --date 2026-11-10 \
+  --exercise reading-staff-steps --feedback appropriate \
+  --comfort comfortable --passed yes --bpm 60 \
+  --context isolation --observation "Read each staff note correctly" \
+  --timezone America/Vancouver \
+  --method-book-id alfred-basic-adult-1 \
+  --method-checkpoint "Level One section 3" \
+  > local/reading-feedback.json
+```
+
+Review and apply the proposal with its exact acknowledgement key, as in the previous section. Then evaluate a *separate*, non-mutating progression gate:
+
+```sh
+pianoctl progression evaluate \
+  --technique reading --target developing --date 2026-11-12 \
+  --state local/learner-state.json > local/reading-gate.json
+
+# Only if gate == "pass", review and explicitly approve:
+pianoctl progression apply local/reading-gate.json \
+  --state local/learner-state.json \
+  --acknowledge 'sha256:PASTE_EXACT_REVIEWED_GATE_KEY'
+
+pianoctl progression due --date 2026-11-25 --state local/learner-state.json
+```
+
+The gate rules require separate approved, comfortable session dates with correct context, treat absent evidence as unknown, and reset promotion evidence after adverse feedback. A `hard` session is adverse even if the exercise self-check passed; read-only historical evaluations are allowed, but backdated promotion approvals that ignore newer feedback are rejected. An adverse report approved after a same-day transition is retained for recovery using append revisions, while same-day positive sessions do not substitute for independent post-transition practice dates. Maintained techniques become due again according to the configured interval (default 14 days), or earlier when recovery is needed. **Human approval is required for both feedback and progression**; a content digest is not a signature. See [progression contracts and gates](docs/progression.md).
+
 ## Source, evidence, and privacy
 
-- Canonical public materials: [exercise catalog](catalogs/exercises.json), [configuration](config/practice.json), [exchange contracts](contracts/v1/README.md), and [architecture](docs/architecture.md).
+- Canonical public materials: [exercise catalog](catalogs/exercises.json), [curriculum and repertoire](catalogs/curriculum.json), [configuration](config/practice.json), [exchange contracts](contracts/v1/README.md), and [architecture](docs/architecture.md).
 - Public fixtures under `examples/` are synthetic. Keep actual practice history, MIDI takes, recordings, and unreviewed proposals in **ignored `local/`**; do not commit them.
 - Do not use MIDI scores to infer physical comfort, illness, finger placement, or mastery. Unknown observations remain unknown.
 - There is no account system, cloud synchronization, external inference, autonomous state promotion, or implicit expenditure.

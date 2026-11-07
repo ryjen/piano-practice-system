@@ -143,6 +143,327 @@
         "Treat the contrast as phrasing, not a force or speed test."
       ],
       "self_check": "Did the expression remain deliberate across the moving notes?"
+    },
+    {
+      "id": "reading-staff-steps",
+      "technique_id": "reading",
+      "level": 0,
+      "title": "Read and locate five staff notes",
+      "notes": [
+        60,
+        62,
+        64,
+        65,
+        67
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Export or display the five-note score and name each note aloud before playing.",
+        "Play one note per beat, checking both staff position and key location.",
+        "Do not infer reading skill from MIDI note matching alone."
+      ],
+      "self_check": "Could you identify each written note before playing without simply memorizing the finger pattern?"
+    },
+    {
+      "id": "reading-accidentals",
+      "technique_id": "reading",
+      "level": 1,
+      "title": "Read sharps and flats in short phrases",
+      "notes": [
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        64,
+        63,
+        62,
+        61,
+        60
+      ],
+      "bpm": 55,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Read the printed accidentals (C C# D Eb E F E Eb D C# C).",
+        "Name each altered note, locate the key, then play slowly.",
+        "Repeat without forcing speed; correct visual reading matters more than the MIDI match."
+      ],
+      "self_check": "Did you read each sharp/flat rather than guessing from the sound or neighboring key?"
+    },
+    {
+      "id": "coordination-alternating",
+      "technique_id": "coordination",
+      "level": 0,
+      "title": "Alternate left and right in steady time",
+      "notes": [
+        48,
+        60,
+        50,
+        62,
+        52,
+        64,
+        53,
+        65
+      ],
+      "bpm": 55,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Use the left hand for the lower notes C3 D3 E3 F3, then the right hand for C4 D4 E4 F4.",
+        "Alternate hands, one note per beat, with no extra gap at hand changes.",
+        "A MIDI recording cannot prove which hand you used; self-check explicitly."
+      ],
+      "self_check": "Were your hands coordinated with an even pulse and minimal tension?"
+    },
+    {
+      "id": "coordination-together",
+      "technique_id": "coordination",
+      "level": 1,
+      "title": "Hands-together chord and melody preparation",
+      "notes": [
+        48,
+        60,
+        52,
+        64,
+        55,
+        67,
+        48,
+        60
+      ],
+      "bpm": 50,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Practice left-hand C3 E3 G3 C3 and right-hand C4 E4 G4 C4 separately first.",
+        "Then play matched octave pairs together as a separate musical-context task.",
+        "Use self-report/recording, not the sequential MIDI gate, to assess simultaneity."
+      ],
+      "self_check": "Did both hands begin the octave pairs together without one hand dragging?"
+    },
+    {
+      "id": "circle-fourths",
+      "technique_id": "circle",
+      "level": 0,
+      "title": "Circle of fourths root navigation",
+      "notes": [
+        60,
+        65,
+        70,
+        63,
+        68,
+        61,
+        66,
+        71,
+        64,
+        69,
+        62,
+        67,
+        60
+      ],
+      "bpm": 48,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Say the roots C F Bb Eb Ab Db Gb B E A D G C.",
+        "Locate each target note deliberately; stay in comfortable keyboard range.",
+        "Name each interval before looking at any diagram."
+      ],
+      "self_check": "Could you name and locate the next fourth without reading a memorized list?"
+    },
+    {
+      "id": "circle-fifths",
+      "technique_id": "circle",
+      "level": 1,
+      "title": "Circle of fifths reverse traversal",
+      "notes": [
+        60,
+        67,
+        62,
+        69,
+        64,
+        71,
+        66,
+        61,
+        68,
+        63,
+        70,
+        65,
+        60
+      ],
+      "bpm": 48,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Say C G D A E B F# Db Ab Eb Bb F C, observing enharmonic names.",
+        "Play roots slowly, without assuming all notes are natural.",
+        "Connect adjacent roots to key signatures, not only finger motion."
+      ],
+      "self_check": "Could you reverse direction and explain the sharp/flat key relationship?"
+    },
+    {
+      "id": "triads-root",
+      "technique_id": "triads",
+      "level": 0,
+      "title": "Major and minor triad construction",
+      "notes": [
+        60,
+        64,
+        67,
+        57,
+        60,
+        64
+      ],
+      "bpm": 54,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Build C-E-G, then A-C-E as separate arpeggios.",
+        "Identify the 4+3 and 3+4 semitone stacks before playing.",
+        "Play as block triads only after you can name the notes."
+      ],
+      "self_check": "Could you describe why one triad is major and the other minor?"
+    },
+    {
+      "id": "triads-inversions",
+      "technique_id": "triads",
+      "level": 1,
+      "title": "Triad inversions and voice-leading",
+      "notes": [
+        60,
+        64,
+        67,
+        64,
+        67,
+        72,
+        67,
+        72,
+        76
+      ],
+      "bpm": 50,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Construct C major root, first inversion, second inversion in a comfortable register.",
+        "Play each voicing as an arpeggio before playing as a block.",
+        "Notice shared tones and minimize movement; MIDI does not assess fingering or voice leading."
+      ],
+      "self_check": "Could you identify root, first, and second inversion by lowest chord tone?"
+    },
+    {
+      "id": "minor-natural",
+      "technique_id": "minor",
+      "level": 0,
+      "title": "A natural minor and the key signature",
+      "notes": [
+        57,
+        59,
+        60,
+        62,
+        64,
+        65,
+        67,
+        69
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Name each note of A natural minor, comparing it to C major.",
+        "Play A-B-C-D-E-F-G-A slowly, then describe its relative major.",
+        "Use the score rather than relying solely on your memorized sequence."
+      ],
+      "self_check": "Could you identify the half-step locations and explain the relative major?"
+    },
+    {
+      "id": "minor-harmonic",
+      "technique_id": "minor",
+      "level": 1,
+      "title": "A harmonic minor and raised seventh",
+      "notes": [
+        57,
+        59,
+        60,
+        62,
+        64,
+        65,
+        68,
+        69
+      ],
+      "bpm": 55,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Contrast A natural minor G with harmonic minor G#.",
+        "Read and play the raised seventh, then resolve it to A.",
+        "Mark the sharp on your score rather than changing the key signature."
+      ],
+      "self_check": "Could you correctly identify and play the raised seventh accidental?"
+    },
+    {
+      "id": "four-note-arpeggio",
+      "technique_id": "four-note",
+      "level": 0,
+      "title": "Build seventh chords from stacked thirds",
+      "notes": [
+        60,
+        64,
+        67,
+        71,
+        57,
+        60,
+        64,
+        67
+      ],
+      "bpm": 48,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Build Cmaj7 (C E G B) and Am7 (A C E G).",
+        "Arpeggiate each before playing as a full four-note chord.",
+        "Describe root, third, fifth, seventh and the difference in chord quality."
+      ],
+      "self_check": "Could you identify each chord tone and play both chords comfortably?"
+    },
+    {
+      "id": "four-note-inversions",
+      "technique_id": "four-note",
+      "level": 1,
+      "title": "Four-note chord inversions and smooth movement",
+      "notes": [
+        60,
+        64,
+        67,
+        71,
+        64,
+        67,
+        71,
+        72
+      ],
+      "bpm": 46,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Compare Cmaj7 root position with its first inversion E G B C.",
+        "Practice arpeggiated and block voicings slowly; record finger comfort.",
+        "Pay attention to hand span; do not stretch through discomfort."
+      ],
+      "self_check": "Did you move between voicings smoothly while identifying the inversion?"
     }
   ]
 }

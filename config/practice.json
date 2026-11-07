@@ -8,8 +8,15 @@
   "preferred_local_time": "19:00",
   "duration_minutes": 20,
   "technique_order": [
+    "reading",
+    "coordination",
+    "minor",
+    "triads",
+    "circle",
+    "four-note",
     "pulse",
     "navigation",
     "dynamics"
-  ]
+  ],
+  "maintenance_interval_days": 14
 }
