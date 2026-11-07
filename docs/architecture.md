@@ -47,3 +47,21 @@ Add versioned schemas for exercise realizations, multi-voice/chord notation, per
 ## Privacy and security
 
 Practice dates, MIDI performance, recordings, and creative material can be personal. Public Git contains only generic examples. Personal history belongs under `local/` by default (ignored). MIDI source port selection must be explicit; do not enumerate or bind DAW control ports as if they were musical-note input. Capture never executes MIDI messages as scripts and never transmits data over a network.
+
+
+### Shared onset-group realization (`onset-groups/v1`)
+
+The legacy catalog `notes` array is still an ordered flat MIDI pitch list.
+An optional `realization` supplies an ordered sequence of onset groups with
+intended left/right-hand roles, admitted only when its flattened pitches
+exactly match the legacy list. Exercises without a realization retain a
+single-note-per-onset interpretation.
+
+`coordination-alternating` and `coordination-together` are explicitly
+modeled. PianGo MusicXML output and MIDI assessment consume those same groups:
+pitch comparison is order-independent *within* a simultaneous group, while
+inter-beat timing and within-group synchronization are separately assessed.
+The declared synchronization tolerance is `min(80 ms, 10% of the target beat
+interval)`. This is an advisory key-onset check only: a generic MIDI stream
+does not identify which hand or finger actually pressed a key. The existing
+human-observation gate remains required for hands-together skill assessment.

@@ -11,6 +11,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from .core import validate_catalog
+from .timeline import onset_groups
 
 STEPS = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 DEFAULT = ("C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B")
@@ -53,21 +54,25 @@ def _spellings(exercise: dict) -> list[str]:
 
 
 def _parts(exercise: dict, spellings: list[str]) -> list[tuple[str, str, str, list[str | None]]]:
-    if exercise["id"] == "coordination-alternating":
-        # The catalog explicitly interleaves LH then RH on successive beats.
-        return [
-            ("P1", "Right hand", "G", [s if i % 2 else None for i, s in enumerate(spellings)]),
-            ("P2", "Left hand", "F", [s if i % 2 == 0 else None for i, s in enumerate(spellings)]),
-        ]
-    if exercise["id"] == "coordination-together":
-        # Flat catalog entries are four LH/RH octave pairs, not eight beats.
-        if len(spellings) % 2:
-            raise ValueError("paired-hand exercise requires an even number of notes")
-        return [
-            ("P1", "Right hand", "G", spellings[1::2]),
-            ("P2", "Left hand", "F", spellings[::2]),
-        ]
-    return [("P1", "Piano (right-hand reference)", "G", spellings)]
+    # Render both hand timelines from the same versioned onset groups used
+    # for MIDI assessment. Legacy sequential drills keep a single staff.
+    if exercise.get("realization") is None:
+        return [("P1", "Piano (right-hand reference)", "G", spellings)]
+    right, left = [], []
+    cursor = 0
+    for group in onset_groups(exercise):
+        span = len(group["pitches"])
+        written = spellings[cursor:cursor + span]
+        cursor += span
+        by_hand = dict(zip(group["hands"], written))
+        right.append(by_hand.get("right"))
+        left.append(by_hand.get("left"))
+    if cursor != len(spellings):
+        raise ValueError("score realization and spelling length disagree")
+    return [
+        ("P1", "Right hand", "G", right),
+        ("P2", "Left hand", "F", left),
+    ]
 
 
 def _write_note(measure: ET.Element, spelling: str | None,

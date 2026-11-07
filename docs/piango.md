@@ -79,3 +79,10 @@ format-specific surface and can also be opened in score editors such as MuseScor
 - [Why MusicXML retains more than MIDI](https://piango.app/learn-piano-sheet-music/)
 - [Local piano curriculum and licensed method-book boundary](curriculum.md)
 - [Oxygen Pro 61 hardware validation](hardware/qualification.md)
+
+
+The explicit coordination score timelines now come from the catalog's
+`onset-groups/v1` realization, shared with the MIDI assessor. A change to
+the intended hand pairing must pass catalog validation, MusicXML contract
+tests, and grouped MIDI tests together; generic `notes` arrays still cannot
+express arbitrary polyphony.

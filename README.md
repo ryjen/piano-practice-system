@@ -56,7 +56,7 @@ The competency progression vocabulary is `discovered → developing → reliable
 The [curriculum catalog](catalogs/curriculum.json) tracks goals beyond the initial timing drills:
 
 - **Sheet reading:** decode notes and accidentals from the printed staff, not just memorize key positions.
-- **Two-handed coordination:** build independence and simultaneous entries; MIDI cannot establish which hand played.
+- **Two-handed coordination:** build independence and simultaneous entries. Explicit onset groups distinguish sequential notes from intended LH/RH octave pairs, with separate beat timing and onset-synchronization checks. MIDI cannot establish which hand actually played.
 - **Circle of fourths/fifths:** navigate key relationships, key signatures, and root locations.
 - **Triads:** major/minor construction, inversions, and voice leading.
 - **Minor keys and accidentals:** natural vs harmonic minor, altered notes, and proper notation.

@@ -220,7 +220,76 @@
         "Alternate hands, one note per beat, with no extra gap at hand changes.",
         "A MIDI recording cannot prove which hand you used; self-check explicitly."
       ],
-      "self_check": "Were your hands coordinated with an even pulse and minimal tension?"
+      "self_check": "Were your hands coordinated with an even pulse and minimal tension?",
+      "realization": {
+        "contract_version": "onset-groups/v1",
+        "onsets": [
+          {
+            "pitches": [
+              48
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              60
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              62
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              64
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              65
+            ],
+            "hands": [
+              "right"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "coordination-together",
@@ -246,7 +315,52 @@
         "Then play matched octave pairs together as a separate musical-context task.",
         "Use self-report/recording, not the sequential MIDI gate, to assess simultaneity."
       ],
-      "self_check": "Did both hands begin the octave pairs together without one hand dragging?"
+      "self_check": "Did both hands begin the octave pairs together without one hand dragging?",
+      "realization": {
+        "contract_version": "onset-groups/v1",
+        "onsets": [
+          {
+            "pitches": [
+              48,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              64
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              67
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              48,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "circle-fourths",
