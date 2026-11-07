@@ -296,6 +296,49 @@ class ProgressionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "checkpoint requires a method book"):
             propose_feedback(self.catalog, state, method_checkpoint="p.1", **common)
 
+    def test_hard_feedback_cannot_support_historical_positive_gate(self):
+        self.session(1, "2026-11-01")
+        completed = self.transition("developing", "2026-11-02")
+        state = self.state()
+        state["sessions"][0]["feedback"] = "hard"
+        self.state_path.write_text(json.dumps(state), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "unsupported positive progression evidence"):
+            evaluate(self.catalog, self.state(), "reading", "reliable-isolation",
+                     "2026-11-06")
+        with self.assertRaisesRegex(ValueError, "unsupported positive progression evidence"):
+            apply_progression(str(self.state_path), self.catalog, completed,
+                              completed["approval_key"])
+
+    def test_backdated_promotion_cannot_ignore_later_approved_failure(self):
+        self.session(1, "2026-11-01")
+        self.transition("developing", "2026-11-02")
+        self.session(2, "2026-11-03")
+        self.session(3, "2026-11-04")
+        self.session(4, "2026-11-05", passed=False, feedback="hard")
+        historical = self.transition("reliable-isolation", "2026-11-04", apply=False)
+        self.assertEqual(historical["gate"], "pass")  # Historical query is allowed.
+        with self.assertRaisesRegex(ValueError, "backdated transition"):
+            apply_progression(str(self.state_path), self.catalog, historical,
+                              historical["approval_key"])
+        self.assertEqual(current_state(self.state(), "reading")[0], "developing")
+        self.assertEqual(
+            self.transition("reliable-isolation", "2026-11-06", apply=False)["gate"],
+            "blocked"
+        )
+
+    def test_later_other_technique_feedback_does_not_block_transition(self):
+        self.session(1, "2026-11-01")
+        state = self.state()
+        extra = propose_feedback(
+            self.catalog, state, event_id="pulse-unrelated", on_date="2026-11-05",
+            exercise_id="pulse-quarter", feedback="appropriate",
+            comfort="comfortable", passed=True, realized_bpm=60,
+            context="isolation"
+        )
+        apply_feedback(self.state_path, self.catalog, extra, extra["approval_key"])
+        approved = self.transition("developing", "2026-11-02")
+        self.assertEqual(approved["gate"], "pass")
+
     def test_negative_gate_cannot_be_applied(self):
         p = self.transition("developing", "2026-11-02", apply=False)
         self.assertEqual(p["gate"], "blocked")

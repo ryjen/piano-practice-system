@@ -36,7 +36,7 @@ Legacy `feedback/v1` events without explicit context remain valid history for sc
 | reliable-context → maintained | 2 additional separate approved, comfortable, passed musical-context dates |
 | one-step regression | At least one explicit adverse feedback/v2 event since preceding transition, separately approved |
 
-An adverse observation (`passed=false`, `comfort=tension`, or `feedback=hard`) **resets forward repeatability gates**. A same-date adverse report that was **approved after** an existing transition is included in recovery/maintenance checks by comparing stored `applied_revision` values. Same-day successes are deliberately excluded from the next stage's distinct-date promotion evidence. Earlier successes cannot be reused to promote immediately after a failure. Missing/unknown fields remain unknown, and one best take cannot prove maintenance. The gate is based on reviewed player observations, not on an independent exam or posture analysis.
+An adverse observation (`passed=false`, `comfort=tension`, or `feedback=hard`) **resets forward repeatability gates**. A hard difficulty report is adverse even when `passed=true` and comfort is reported comfortable. Historical validation rejects attempts to use it as positive competency evidence. A same-date adverse report that was **approved after** an existing transition is included in recovery/maintenance checks by comparing stored `applied_revision` values. Same-day successes are deliberately excluded from the next stage's distinct-date promotion evidence. Earlier successes cannot be reused to promote immediately after a failure. Missing/unknown fields remain unknown, and one best take cannot prove maintenance. The gate is based on reviewed player observations, not on an independent exam or posture analysis.
 
 ```sh
 pianoctl progression evaluate \
@@ -50,7 +50,7 @@ pianoctl progression apply local/reading-progression-proposal.json \
   --acknowledge 'sha256:REPLACE_WITH_REVIEWED_KEY'
 ```
 
-Progression approval persists an append-only event, checks expected source revision and canonical content digests under a cooperative POSIX lock, rejects stale or conflicting transitions, and uses atomic state replacement. Exact replay reports `already-applied`; the approval key is a *content acknowledgement*, **not** identity proof or a digital signature. Out-of-band editors ignoring the lock violate the single-user concurrency contract.
+Progression approval persists an append-only event, checks expected source revision and canonical content digests under a cooperative POSIX lock, rejects stale or conflicting transitions, and uses atomic state replacement. The read-only gate may evaluate a past date, but approval refuses a backdated transition that would disregard any newer approved practice feedback for the same technique. Exact replay reports `already-applied`; the approval key is a *content acknowledgement*, **not** identity proof or a digital signature. Out-of-band editors ignoring the lock violate the single-user concurrency contract.
 
 ## Maintenance queue
 

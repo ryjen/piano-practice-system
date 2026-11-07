@@ -27,7 +27,7 @@ The state moves only through explicit, reviewed `feedback apply` or `progression
 
 Each approved feedback/v2 and progression event carries its `applied_revision` so an adverse report added after a transition on the same calendar date is still available for recovery checks. Same-day positive evidence does not count as a new independent practice date. Exact-event replays must match the original append revision.
 
-Technique states: `discovered → developing → reliable-isolation → reliable-context → maintained`. Reviewable lifecycle states `paused` and `retired` are vocabulary only, not part of the v1 transition writer. A one-step regression needs explicit adverse evidence. Positive gate requirements are based on distinct approved practice dates after the previous transition and latest adverse feedback.
+Technique states: `discovered → developing → reliable-isolation → reliable-context → maintained`. Reviewable lifecycle states `paused` and `retired` are vocabulary only, not part of the v1 transition writer. A one-step regression needs explicit adverse evidence. Positive gate requirements are based on distinct approved practice dates after the previous transition and latest adverse feedback. An explicitly `hard` report cannot support a positive gate, even when the player also reports `passed=true`. Applying a historical proposal refuses backdating behind later approved practice observations for the same technique.
 
 The content catalogs are intended as public synthetic/reference resources. Actual practice history, recordings, MIDI takes, and score page tracking are private and ignored under `local/`. Do not ship copyrighted method-book material into either public fixtures or generated files.
 

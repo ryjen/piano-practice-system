@@ -118,6 +118,7 @@ def validate_events(state: dict, catalog: dict) -> None:
             if len({s["date"] for s in referenced}) < needed:
                 raise ValueError("progression requires distinct evidence dates")
             if any(s["passed"] is not True or s["comfort"] != "comfortable"
+                   or s["feedback"] == "hard"
                    or (scope != "any" and s["context"] != scope) for s in referenced):
                 raise ValueError("unsupported positive progression evidence")
         elif not any(s["passed"] is False or s["comfort"] == "tension"
@@ -289,6 +290,18 @@ def apply(path: str, catalog: dict, proposal: dict, acknowledgement: str) -> dic
         digest = "sha256:" + hashlib.sha256(canonical(state)).hexdigest()
         if digest != proposal["state_digest"]:
             raise ValueError("state content changed without revision update")
+        # An approved transition is a present-tense state change, not a
+        # historical query. Refuse to bypass later approved feedback by
+        # backdating the effective date; allow read-only historical evaluate.
+        exercise_owners = {e["id"]: e["technique_id"] for e in catalog["exercises"]}
+        latest_observation = max(
+            (_iso(s["date"]) for s in state["sessions"]
+             if s["approved"] and
+             exercise_owners[s["exercise_id"]] == proposal["technique_id"]),
+            default=None,
+        )
+        if latest_observation is not None and _iso(proposal["effective_date"]) < latest_observation:
+            raise ValueError("backdated transition ignores later approved practice feedback")
         # Recalculate the gate under the lock, on exact current contents.
         verified = evaluate(catalog, state, proposal["technique_id"],
                             proposal["to_state"], proposal["effective_date"])
