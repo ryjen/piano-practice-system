@@ -909,82 +909,89 @@
         83,
         48,
         84,
-        83,
-        81,
-        79,
-        77,
-        76,
-        74,
-        72,
         50,
-        74,
-        52,
-        76,
-        53,
-        77,
-        55,
-        79,
-        57,
-        81,
-        59,
         83,
+        52,
+        81,
+        53,
+        79,
+        55,
+        77,
+        57,
+        76,
+        59,
+        74,
         60,
-        84,
-        59,
-        83,
-        57,
-        81,
-        55,
-        79,
-        53,
-        77,
-        52,
-        76,
-        50,
-        74,
-        48,
         72,
-        47,
-        74,
-        45,
-        76,
-        43,
-        77,
-        41,
-        79,
-        40,
-        81,
-        38,
-        83,
-        36,
-        84,
-        38,
-        83,
-        40,
-        81,
-        41,
-        79,
-        43,
-        77,
-        45,
-        76,
-        47,
-        74,
-        48,
-        72,
-        47,
-        71,
-        45,
-        69,
-        43,
-        67,
-        41,
-        65,
-        40,
-        64,
-        38,
         62,
-        36,
+        74,
+        64,
+        76,
+        65,
+        77,
+        67,
+        79,
+        69,
+        81,
+        71,
+        83,
+        72,
+        84,
+        71,
+        83,
+        69,
+        81,
+        67,
+        79,
+        65,
+        77,
+        64,
+        76,
+        62,
+        74,
+        60,
+        72,
+        59,
+        74,
+        57,
+        76,
+        55,
+        77,
+        53,
+        79,
+        52,
+        81,
+        50,
+        83,
+        48,
+        84,
+        50,
+        83,
+        52,
+        81,
+        53,
+        79,
+        55,
+        77,
+        57,
+        76,
+        59,
+        74,
+        60,
+        72,
+        59,
+        71,
+        57,
+        69,
+        55,
+        67,
+        53,
+        65,
+        52,
+        64,
+        50,
+        62,
+        48,
         60
       ],
       "bpm": 48,
@@ -992,13 +999,13 @@
       "dynamics": null,
       "assessment_mode": "human",
       "instructions": [
-        "Provisional C-major rendition of the player's described drill; confirm starting octaves and reversals against the player's physical technique.",
+        "Practice this provisional C-major example, starting LH C3 and RH C4; actual starting octaves still need player confirmation.",
         "1. Both hands ascend one octave together.",
-        "2. LH reverses downward as RH ascends another octave, then RH returns while LH pauses.",
-        "3. Both hands ascend an octave and return together.",
-        "4. Both hands move outward in contrary motion by one octave and return.",
-        "5. Both hands descend an octave together.",
-        "Review the hand-specific transitions and finger crossings with a teacher or score; do not equate MIDI-pitch accuracy with technique."
+        "2. LH descends and RH ascends one octave in contrary motion, then both return.",
+        "3. Both hands ascend one octave and return together.",
+        "4. LH descends and RH ascends one octave in contrary motion, then both return.",
+        "5. Both hands descend one octave together.",
+        "Verify phase boundaries and actual hand-specific fingering in person; do not equate pitch-matched MIDI with measured technique."
       ],
       "self_check": "Could you complete all five phases with even timing, clear reversals and comfortable crossings?",
       "realization": {
@@ -1156,64 +1163,8 @@
           },
           {
             "pitches": [
-              83
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              81
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              79
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              77
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              76
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              74
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              72
-            ],
-            "hands": [
-              "right"
-            ]
-          },
-          {
-            "pitches": [
               50,
-              74
+              83
             ],
             "hands": [
               "left",
@@ -1223,36 +1174,6 @@
           {
             "pitches": [
               52,
-              76
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              53,
-              77
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              55,
-              79
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              57,
               81
             ],
             "hands": [
@@ -1262,8 +1183,38 @@
           },
           {
             "pitches": [
+              53,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              57,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
               59,
-              83
+              74
             ],
             "hands": [
               "left",
@@ -1273,7 +1224,147 @@
           {
             "pitches": [
               60,
+              72
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              62,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              64,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              65,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              67,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              69,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              71,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              72,
               84
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              71,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              69,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              67,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              65,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              64,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              62,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              60,
+              72
             ],
             "hands": [
               "left",
@@ -1283,7 +1374,7 @@
           {
             "pitches": [
               59,
-              83
+              74
             ],
             "hands": [
               "left",
@@ -1293,7 +1384,7 @@
           {
             "pitches": [
               57,
-              81
+              76
             ],
             "hands": [
               "left",
@@ -1303,7 +1394,7 @@
           {
             "pitches": [
               55,
-              79
+              77
             ],
             "hands": [
               "left",
@@ -1313,7 +1404,7 @@
           {
             "pitches": [
               53,
-              77
+              79
             ],
             "hands": [
               "left",
@@ -1323,7 +1414,7 @@
           {
             "pitches": [
               52,
-              76
+              81
             ],
             "hands": [
               "left",
@@ -1333,76 +1424,6 @@
           {
             "pitches": [
               50,
-              74
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              48,
-              72
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              47,
-              74
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              45,
-              76
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              43,
-              77
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              41,
-              79
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              40,
-              81
-            ],
-            "hands": [
-              "left",
-              "right"
-            ]
-          },
-          {
-            "pitches": [
-              38,
               83
             ],
             "hands": [
@@ -1412,7 +1433,7 @@
           },
           {
             "pitches": [
-              36,
+              48,
               84
             ],
             "hands": [
@@ -1422,7 +1443,7 @@
           },
           {
             "pitches": [
-              38,
+              50,
               83
             ],
             "hands": [
@@ -1432,7 +1453,7 @@
           },
           {
             "pitches": [
-              40,
+              52,
               81
             ],
             "hands": [
@@ -1442,7 +1463,7 @@
           },
           {
             "pitches": [
-              41,
+              53,
               79
             ],
             "hands": [
@@ -1452,7 +1473,7 @@
           },
           {
             "pitches": [
-              43,
+              55,
               77
             ],
             "hands": [
@@ -1462,7 +1483,7 @@
           },
           {
             "pitches": [
-              45,
+              57,
               76
             ],
             "hands": [
@@ -1472,7 +1493,7 @@
           },
           {
             "pitches": [
-              47,
+              59,
               74
             ],
             "hands": [
@@ -1482,7 +1503,7 @@
           },
           {
             "pitches": [
-              48,
+              60,
               72
             ],
             "hands": [
@@ -1492,7 +1513,7 @@
           },
           {
             "pitches": [
-              47,
+              59,
               71
             ],
             "hands": [
@@ -1502,7 +1523,7 @@
           },
           {
             "pitches": [
-              45,
+              57,
               69
             ],
             "hands": [
@@ -1512,7 +1533,7 @@
           },
           {
             "pitches": [
-              43,
+              55,
               67
             ],
             "hands": [
@@ -1522,7 +1543,7 @@
           },
           {
             "pitches": [
-              41,
+              53,
               65
             ],
             "hands": [
@@ -1532,7 +1553,7 @@
           },
           {
             "pitches": [
-              40,
+              52,
               64
             ],
             "hands": [
@@ -1542,7 +1563,7 @@
           },
           {
             "pitches": [
-              38,
+              50,
               62
             ],
             "hands": [
@@ -1552,7 +1573,7 @@
           },
           {
             "pitches": [
-              36,
+              48,
               60
             ],
             "hands": [
@@ -1570,7 +1591,7 @@
           },
           {
             "id": "left-reverses-right-extends",
-            "label": "LH descends while RH ascends another octave, then RH returns while LH rests",
+            "label": "LH descends and RH ascends one octave in contrary motion; both return",
             "start": 8,
             "end": 22
           },
@@ -1582,7 +1603,7 @@
           },
           {
             "id": "contrary-out-return",
-            "label": "LH descends while RH ascends; both return",
+            "label": "LH descends and RH ascends one octave in contrary motion; both return",
             "start": 36,
             "end": 50
           },
@@ -1593,20 +1614,7 @@
             "end": 57
           }
         ],
-        "finger_cues": [
-          {
-            "onset_index": 5,
-            "hand": "left",
-            "finger": 3,
-            "label": "LH first-octave crossing; review with teacher"
-          },
-          {
-            "onset_index": 26,
-            "hand": "left",
-            "finger": 3,
-            "label": "LH crossing while repeating upward scale"
-          }
-        ]
+        "finger_cues": []
       }
     }
   ]

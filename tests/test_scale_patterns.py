@@ -55,15 +55,61 @@ class PersonalScalePatternsTests(unittest.TestCase):
         ])
         self.assertEqual([(p["start"], p["end"]) for p in phases],
                          [(0, 8), (8, 22), (22, 36), (36, 50), (50, 57)])
-        # Phase 2: RH returns solo while LH pauses.
-        self.assertEqual(groups[15]["hands"], ["right"])
-        # Phase 4 reaches the outer bounds in opposite directions.
-        self.assertEqual(groups[42]["pitches"], [36, 84])
-        self.assertEqual(groups[-1]["pitches"], [36, 60])
-        root = ET.fromstring(to_piango_musicxml(self.catalog, ex["id"]))
+        # All five phases are played with BOTH hands, including the return
+        # in phase 2 and phase 4. Check concrete pitches and phase continuity.
+        self.assertTrue(all(g["hands"] == ["left", "right"] for g in groups))
+        self.assertEqual(groups[0]["pitches"], [48, 60])     # LH C3 / RH C4
+        self.assertEqual(groups[7]["pitches"], [60, 72])    # phase 1 end
+        self.assertEqual(groups[14]["pitches"], [48, 84])   # phase 2 outer notes
+        self.assertEqual(groups[15]["pitches"], [50, 83])   # BOTH reverse
+        self.assertEqual(groups[21]["pitches"], [60, 72])   # phase 2 return
+        self.assertEqual(groups[28]["pitches"], [72, 84])   # phase 3 apex
+        self.assertEqual(groups[35]["pitches"], [60, 72])   # phase 3 return
+        self.assertEqual(groups[42]["pitches"], [48, 84])   # phase 4 outer notes
+        self.assertEqual(groups[49]["pitches"], [60, 72])   # phase 4 return
+        self.assertEqual(groups[56]["pitches"], [48, 60])   # final lower C3/C4
+        self.assertEqual(groups[8:22], groups[36:50])       # same contrary arc
+        self.assertEqual(realization["finger_cues"], [])     # not confirmed here
+        for before, after in zip(groups, groups[1:]):
+            self.assertTrue(all(1 <= abs(b - a) <= 2 for a, b in
+                                zip(before["pitches"], after["pitches"])))
+        root = ET.fromstring(to_piango_musicxml(self.catalog, ex["id"],
+                                                fingering_reference=True))
         self.assertEqual(len(root.findall("./part")), 2)
         self.assertEqual(len(root.findall(".//direction-type/words")), 5)
-        self.assertEqual(root.findall("./part")[1].findall(".//fingering"), [])
+        self.assertEqual(root.findall(".//fingering"), [])
+        for part in root.findall("./part"):
+            rendered = part.findall("./measure/note")
+            # Three trailing rests merely fill the last four-beat measure;
+            # every one of the 57 authored hand onsets must remain a note.
+            self.assertTrue(all(n.find("pitch") is not None for n in rendered[:57]))
+            self.assertTrue(all(n.find("rest") is not None for n in rendered[57:]))
+
+
+    def test_five_phase_direction_and_both_hand_reversals(self):
+        """Direction is an independent musical assertion, not a generator echo."""
+        groups = onset_groups(self.exercises["scale-five-phase-opposing"])
+
+        def motion(start, end, left_sign, right_sign):
+            for i in range(start, end):
+                before = groups[i - 1]["pitches"]
+                after = groups[i]["pitches"]
+                self.assertEqual(
+                    (1 if after[0] > before[0] else -1,
+                     1 if after[1] > before[1] else -1),
+                    (left_sign, right_sign),
+                    f"wrong direction at onset {i}"
+                )
+
+        motion(1, 8, +1, +1)    # phase 1: parallel ascent
+        motion(8, 15, -1, +1)   # phase 2: outward contrary
+        motion(15, 22, +1, -1)  # phase 2: BOTH return
+        motion(22, 29, +1, +1)  # phase 3: parallel ascent
+        motion(29, 36, -1, -1)  # phase 3: BOTH return
+        motion(36, 43, -1, +1)  # phase 4: outward contrary
+        motion(43, 50, +1, -1)  # phase 4: BOTH return
+        motion(50, 57, -1, -1)  # phase 5: parallel descent
+        self.assertEqual(groups[0]["pitches"], groups[-1]["pitches"])
 
     def test_original_arpeggios_are_playable_sequences(self):
         foundation = self.exercises["arpeggio-major-one-octave"]
@@ -108,12 +154,21 @@ class PersonalScalePatternsTests(unittest.TestCase):
                     pattern["phases"][1]["start"] += 1
                 if mode == "phase-overrun":
                     pattern["phases"][-1]["end"] += 1
-                if mode == "unknown-hand":
-                    pattern["finger_cues"][0]["hand"] = "not-a-hand"
-                if mode == "invalid-finger":
-                    pattern["finger_cues"][0]["finger"] = 0
+                if mode in ("unknown-hand", "invalid-finger"):
+                    crossing = next(x for x in catalog["exercises"]
+                                    if x["id"] == "scale-crossings-two-octaves")
+                    cue = crossing["realization"]["finger_cues"][0]
+                    if mode == "unknown-hand":
+                        cue["hand"] = "not-a-hand"
+                    else:
+                        cue["finger"] = 0
                 if mode == "wrong-fingering-position":
-                    pattern["finger_cues"][0]["onset_index"] = 15  # RH-only beat
+                    alternating = next(x for x in catalog["exercises"]
+                                       if x["id"] == "coordination-alternating")
+                    alternating["realization"]["finger_cues"] = [{
+                        "onset_index": 0, "hand": "right",
+                        "finger": 3, "label": "invalid RH cue on LH-only note",
+                    }]
                 with self.assertRaises(ValueError):
                     validate_catalog(catalog)
 

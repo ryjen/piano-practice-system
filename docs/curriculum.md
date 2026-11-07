@@ -38,14 +38,16 @@ Two arpeggio exercises are now independent focus targets:
 
 For two-hand scale coordination, `scale-crossings-two-octaves` begins on LH C3 / RH C4 and travels up two C-major octaves in parallel. The player's reported left-hand crossing cues are attached to LH A3 (finger **3**, first octave) and LH D4 (finger **4**, second octave). These represent *the user's technique reference*, not a MIDI-observed finger movement or universal prescribed fingering.
 
-`scale-five-phase-opposing` models the described pattern as five contiguous spans of original C-major note groups:
+`scale-five-phase-opposing` now models the **clarified** five-phase motion as five contiguous two-hand spans. No phase uses an LH rest:
 
-1. Both hands ascend one octave together.
-2. LH reverses downward while RH climbs another octave; RH returns while LH rests.
-3. Both ascend an octave and return together.
-4. LH descends while RH ascends in contrary motion, then both return.
-5. Both descend an octave.
+| Phase | Left-hand path (illustrative) | Right-hand path (illustrative) | Motion |
+| --- | --- | --- | --- |
+| 1 | C3 → C4 | C4 → C5 | Both ascend one octave |
+| 2 | C4 → C3 → C4 | C5 → C6 → C5 | Contrary outward, **both return** |
+| 3 | C4 → C5 → C4 | C5 → C6 → C5 | Parallel up, **both return** |
+| 4 | C4 → C3 → C4 | C5 → C6 → C5 | Contrary outward, **both return** |
+| 5 | C4 → C3 | C5 → C4 | Both descend one octave |
 
-The layout is provisional because the user's original description does not specify starting notes, exact reversal timing, or whether LH sustains during RH's solo return. The machine-readable catalog uses a five-phase `onset-groups/v1` realization with clear start/end indices, separate hand tracks and optional *printed* crossing cues. It must be confirmed in the user's actual piano routine before asserting ergonomic or musical correctness. Nothing from the user-owned Alfred books is reproduced.
+The relative motion and return behavior follow the player's correction. **LH C3 / RH C4 are still illustrative starting octaves**, not user-confirmed physical registers. The machine-readable `onset-groups/v1` realization uses 57 contiguous two-hand onsets, explicit phases, and no inferred fingering cues for this five-phase exercise. The **independent** `scale-crossings-two-octaves` drill retains the player-reported LH finger 3 on A3 / finger 4 on D4. Neither cue verifies an actual finger motion. Nothing from the user-owned Alfred books is reproduced.
 
 **Technique gate:** MIDI may evaluate event timing, intended note groups and synchronization; only a reviewed self-check can establish hand identity, finger crossing, posture, tension and meaningful scale reading.

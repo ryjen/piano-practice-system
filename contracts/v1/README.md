@@ -53,9 +53,12 @@ An `onset-groups/v1` realization may additionally contain bounded, contiguous
 (intended hand, onset index, finger 1–5, descriptive label). Each cue must
 reference an actually present note for that intended hand; duplicate cues,
 unknown hands, out-of-range fingers and gapped phases fail catalog validation.
-These are instructional references, **never sensed fingering**. The five-phase
-C-major scale arrangement and LH finger 3/4 crossing cues are explicitly
-provisional player-provided goals, not qualified physical evidence.
+These are instructional references, **never sensed fingering**. In the clarified
+five-phase C-major realization all 57 onsets contain two intended notes;
+phases 2 and 4 explicitly return **both** hands rather than resting LH.
+Its physical starting register remains provisional and it carries **no**
+finger-specific annotation. The separate two-octave LH finger 3/4 crossing
+cues are player-provided references, not qualified physical evidence.
 
 
 A legacy one-note-per-onset session may report `hands: [null]` to

@@ -34,7 +34,7 @@ Hosted subscriptions, mandatory AI services, uploading private practice logs, au
 
 ### Personal technique follow-up
 
-The authored five-phase scale pattern is provisionally mapped in C major; physical starting octaves, contrary-motion geometry, and the LH 3→4 crossing references require direct player/teacher confirmation. The reference score and named phase metadata are not a finger-detection system. Transposing these patterns to additional keys and adding left/right-specific fingering recommendations remains an opt-in later enhancement.
+The clarified five-phase movement is represented in C major, including **both-hand returns** for the contrary-motion phases 2 and 4. Physical starting octaves (illustratively LH C3 / RH C4), exact five-phase fingering and ergonomic suitability still require direct player/teacher confirmation. LH finger 3 on A3 and 4 on D4 remain separate, explicitly user-reported cues in the two-octave scale drill. Neither score nor phase metadata detects fingers. Transposition to other keys and validated finger-specific recommendations remain opt-in later enhancements.
 
 
 ### Goal-weighted planner (software)
