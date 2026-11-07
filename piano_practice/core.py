@@ -7,6 +7,7 @@ STATES = ("discovered", "developing", "reliable-isolation",
           "reliable-context", "maintained", "paused", "retired")
 FEEDBACK = ("easy", "appropriate", "hard")
 COMFORT = ("comfortable", "tension", "unknown")
+MAX_SESSIONS = 10_000
 
 
 def validate_catalog(catalog: dict) -> None:
@@ -42,10 +43,18 @@ def validate_state(state: dict, catalog: dict) -> None:
     if state.get("schema_version") != 1 or type(state.get("revision")) is not int or state["revision"] < 0:
         raise ValueError("invalid learner state")
     sessions = state.get("sessions")
-    if not isinstance(sessions, list):
-        raise ValueError("sessions must be a list")
+    if not isinstance(sessions, list) or len(sessions) > MAX_SESSIONS:
+        raise ValueError(f"sessions must be a list of at most {MAX_SESSIONS} records")
     valid_ids = {e["id"] for e in catalog["exercises"]}
+    seen_ids = set()
     for entry in sessions:
+        if not isinstance(entry, dict):
+            raise ValueError("session must be an object")
+        event_id = entry.get("id")
+        if event_id is not None:
+            if not isinstance(event_id, str) or not event_id or event_id in seen_ids:
+                raise ValueError("duplicate or invalid session event id")
+            seen_ids.add(event_id)
         if entry.get("exercise_id") not in valid_ids:
             raise ValueError("unknown exercise in state")
         date.fromisoformat(entry["date"])

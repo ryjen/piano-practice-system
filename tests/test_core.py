@@ -3,7 +3,7 @@ import json
 import unittest
 from pathlib import Path
 
-from piano_practice.core import propose, validate_catalog
+from piano_practice.core import MAX_SESSIONS, propose, validate_catalog, validate_state
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -95,6 +95,26 @@ class PlannerTests(unittest.TestCase):
         self.add("2026-11-04", "dynamics-contrast")
         self.assertEqual(propose(self.catalog, self.state, self.config, "2026-11-10")["exercise_id"],
                          "pulse-quarter")
+
+    def test_bounded_history_and_duplicate_event_ids_fail_closed(self):
+        example = dict(date="2026-11-01", exercise_id="pulse-quarter",
+                       feedback="appropriate", comfort="comfortable",
+                       passed=True, approved=True)
+        self.state["sessions"] = [
+            {**example, "id": f"session-{i}"} for i in range(MAX_SESSIONS)
+        ]
+        validate_state(self.state, self.catalog)
+        self.state["sessions"].append({**example, "id": "session-over-limit"})
+        with self.assertRaisesRegex(ValueError, "at most"):
+            validate_state(self.state, self.catalog)
+        self.state["sessions"].pop()
+        self.state["sessions"][1]["id"] = "session-0"
+        with self.assertRaisesRegex(ValueError, "duplicate"):
+            validate_state(self.state, self.catalog)
+        self.state["sessions"][1]["id"] = "session-1"
+        self.state["sessions"][1] = None
+        with self.assertRaisesRegex(ValueError, "session must be"):
+            validate_state(self.state, self.catalog)
 
     def test_reproducible_and_unchanged_inputs(self):
         before = copy.deepcopy(self.state)

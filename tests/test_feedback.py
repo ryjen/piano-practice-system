@@ -4,6 +4,7 @@ import tempfile
 import unittest
 
 from piano_practice.feedback import apply, proposal
+from piano_practice.core import MAX_SESSIONS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -52,6 +53,20 @@ class FeedbackLedgerTests(unittest.TestCase):
         self.assertEqual(apply(self.path, self.catalog, p, p["approval_key"])["result"],
                          "already-applied")
         self.assertEqual(load_state(self.path), written)
+
+    def test_approval_cannot_exceed_history_bound(self):
+        example = dict(date="2026-11-01", exercise_id="pulse-quarter",
+                       feedback="appropriate", comfort="comfortable",
+                       passed=True, approved=True)
+        self.state["sessions"] = [
+            {**example, "id": f"old-{i}"} for i in range(MAX_SESSIONS)
+        ]
+        self.save()
+        p = self.propose()
+        before = self.path.read_bytes()
+        with self.assertRaisesRegex(ValueError, "at most"):
+            apply(self.path, self.catalog, p, p["approval_key"])
+        self.assertEqual(self.path.read_bytes(), before)
 
     def test_stale_proposal_fails_closed(self):
         p1 = self.propose()
