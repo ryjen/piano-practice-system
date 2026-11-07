@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from piano_practice.piango import STEPS, to_piango_musicxml
+from piano_practice.timeline import onset_groups
+from piano_practice.core import validate_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,9 +52,15 @@ class PianGoExportTests(unittest.TestCase):
                     self.assertEqual(pitch_numbers(parts[0])[1::2][:4], expected[1::2])
                     self.assertEqual(pitch_numbers(parts[1])[::2][:4], expected[::2])
                     self.assertEqual(pitch_numbers(parts[1])[1::2][:4], [None] * 4)
-                elif ex["id"] == "coordination-together":
-                    self.assertEqual(pitch_numbers(parts[0])[:4], expected[1::2])
-                    self.assertEqual(pitch_numbers(parts[1])[:4], expected[::2])
+                elif ex.get("realization") is not None:
+                    groups = onset_groups(ex)
+                    for part_index, hand in enumerate(("right", "left")):
+                        intended = [
+                            next((note for note, role in zip(group["pitches"], group["hands"])
+                                  if role == hand), None)
+                            for group in groups
+                        ]
+                        self.assertEqual(pitch_numbers(parts[part_index])[:len(groups)], intended)
                     self.assertEqual(parts[0].findtext("./measure/attributes/clef/sign"), "G")
                     self.assertEqual(parts[1].findtext("./measure/attributes/clef/sign"), "F")
                 else:
@@ -63,6 +71,29 @@ class PianGoExportTests(unittest.TestCase):
                         self.assertEqual(sum(durations), 8)
                 self.assertEqual(len(root.findall(".//fingering")), 0)
         self.assertEqual(source, snapshot)
+
+    def test_normalized_legacy_unspecified_hand_retains_pitches(self):
+        data = catalog()
+        pulse = next(e for e in data["exercises"] if e["id"] == "pulse-quarter")
+        pulse["realization"] = {
+            "contract_version": "onset-groups/v1",
+            "onsets": onset_groups(pulse)
+        }
+        validate_catalog(data)
+        root = ET.fromstring(to_piango_musicxml(data, "pulse-quarter"))
+        parts = root.findall("./part")
+        self.assertEqual(len(parts), 1)
+        self.assertEqual(pitch_numbers(parts[0])[:4], [60, 60, 60, 60])
+        self.assertEqual(len(parts[0].findall(".//rest")), 0)
+
+    def test_mixed_named_and_unspecified_roles_fail_closed(self):
+        data = catalog()
+        ex = next(e for e in data["exercises"]
+                  if e["id"] == "coordination-alternating")
+        ex["realization"]["onsets"][0]["hands"] = [None]
+        validate_catalog(data)
+        with self.assertRaisesRegex(ValueError, "mixed named/unspecified"):
+            to_piango_musicxml(data, ex["id"])
 
     def test_eighth_notes_are_not_exported_as_quarters(self):
         root = ET.fromstring(to_piango_musicxml(catalog(), "pulse-eighth"))

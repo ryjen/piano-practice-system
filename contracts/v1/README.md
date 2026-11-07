@@ -33,3 +33,33 @@ Technique states: `discovered → developing → reliable-isolation → reliable
 The content catalogs are intended as public synthetic/reference resources. Actual practice history, recordings, MIDI takes, and score page tracking are private and ignored under `local/`. Do not ship copyrighted method-book material into either public fixtures or generated files.
 
 See [progression semantics](../../docs/progression.md), [curriculum references](../../docs/curriculum.md), and [Oxygen Pro 61 qualification](../../docs/hardware/qualification.md).
+
+
+### Onset-group extensions
+
+`onset-groups/v1` is an optional catalog realization containing ordered
+`onsets`, each with `pitches` and aligned intended `hands` values
+(`left`/`right`). The flattened sequence must match the existing
+`catalog/v1` note order or validation fails; absent realization means one
+note per onset. `session/v1` includes the normalized realization as advisory
+metadata. `assessment/v1` adds a `within_group_sync` check and timing
+metrics for group starts while retaining its original pitch/lifecycle
+checks. Two-handed exercise results still carry an unknown required human
+observation and can never autonomously approve proficiency.
+
+
+An `onset-groups/v1` realization may additionally contain bounded, contiguous
+`phases` (named start/end beat indices) and optional `finger_cues`
+(intended hand, onset index, finger 1–5, descriptive label). Each cue must
+reference an actually present note for that intended hand; duplicate cues,
+unknown hands, out-of-range fingers and gapped phases fail catalog validation.
+These are instructional references, **never sensed fingering**. The five-phase
+C-major scale arrangement and LH finger 3/4 crossing cues are explicitly
+provisional player-provided goals, not qualified physical evidence.
+
+
+A legacy one-note-per-onset session may report `hands: [null]` to
+preserve **unspecified** hand identity. In an explicit simultaneous pair, both
+intended roles must be named distinctly `left` and `right`.
+MIDI timing and within-group synchronization are `unknown` (not passing)
+when any extra onset remains unmatched after consuming the expected groups.

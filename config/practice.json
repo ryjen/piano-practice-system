@@ -16,7 +16,9 @@
     "four-note",
     "pulse",
     "navigation",
-    "dynamics"
+    "dynamics",
+    "arpeggios",
+    "scale-patterns"
   ],
   "maintenance_interval_days": 14
 }

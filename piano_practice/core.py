@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from datetime import date
 
+from .timeline import onset_groups
+
 STATES = ("discovered", "developing", "reliable-isolation",
           "reliable-context", "maintained", "paused", "retired")
 FEEDBACK = ("easy", "appropriate", "hard")
@@ -37,6 +39,9 @@ def validate_catalog(catalog: dict) -> None:
             raise ValueError("unsupported dynamics gate")
         if ex.get("assessment_mode", "midi") not in ("midi", "human"):
             raise ValueError("unknown assessment mode")
+        # Validate the optional explicit score/performance timeline against
+        # the legacy flat MIDI pitch list at catalog admission time.
+        onset_groups(ex)
 
 
 def validate_state(state: dict, catalog: dict) -> None:
@@ -170,6 +175,12 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         "exercise_id": exercise["id"],
         "exercise_title": exercise["title"],
         "notes_midi": exercise["notes"],
+        "realization": {
+            "contract_version": "onset-groups/v1",
+            "onsets": onset_groups(exercise),
+            "phases": exercise.get("realization", {}).get("phases", []),
+            "finger_cues": exercise.get("realization", {}).get("finger_cues", []),
+        },
         "instructions": exercise["instructions"],
         "self_check": exercise["self_check"],
         "bpm": bpm,

@@ -11,6 +11,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from .core import validate_catalog
+from .timeline import onset_groups
 
 STEPS = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 DEFAULT = ("C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B")
@@ -53,21 +54,34 @@ def _spellings(exercise: dict) -> list[str]:
 
 
 def _parts(exercise: dict, spellings: list[str]) -> list[tuple[str, str, str, list[str | None]]]:
-    if exercise["id"] == "coordination-alternating":
-        # The catalog explicitly interleaves LH then RH on successive beats.
-        return [
-            ("P1", "Right hand", "G", [s if i % 2 else None for i, s in enumerate(spellings)]),
-            ("P2", "Left hand", "F", [s if i % 2 == 0 else None for i, s in enumerate(spellings)]),
-        ]
-    if exercise["id"] == "coordination-together":
-        # Flat catalog entries are four LH/RH octave pairs, not eight beats.
-        if len(spellings) % 2:
-            raise ValueError("paired-hand exercise requires an even number of notes")
-        return [
-            ("P1", "Right hand", "G", spellings[1::2]),
-            ("P2", "Left hand", "F", spellings[::2]),
-        ]
-    return [("P1", "Piano (right-hand reference)", "G", spellings)]
+    # Render both hand timelines from the same versioned onset groups used
+    # for MIDI assessment. Legacy sequential drills keep a single staff.
+    if exercise.get("realization") is None:
+        return [("P1", "Piano (right-hand reference)", "G", spellings)]
+    groups = onset_groups(exercise)
+    # A normalized legacy realization explicitly preserves unknown hand
+    # identity. Render it on the reference staff, not as two tracks of rests.
+    if all(group["hands"] == [None] for group in groups):
+        return [("P1", "Piano (unspecified-hand reference)", "G", spellings)]
+    # Mixed unnamed/named roles are valid evidence but not an exportable
+    # two-track score without inventing a hand assignment. Fail closed.
+    if any(None in group["hands"] for group in groups):
+        raise ValueError("cannot export a mixed named/unspecified-hand realization")
+    right, left = [], []
+    cursor = 0
+    for group in groups:
+        span = len(group["pitches"])
+        written = spellings[cursor:cursor + span]
+        cursor += span
+        by_hand = dict(zip(group["hands"], written))
+        right.append(by_hand.get("right"))
+        left.append(by_hand.get("left"))
+    if cursor != len(spellings):
+        raise ValueError("score realization and spelling length disagree")
+    return [
+        ("P1", "Right hand", "G", right),
+        ("P2", "Left hand", "F", left),
+    ]
 
 
 def _write_note(measure: ET.Element, spelling: str | None,
@@ -118,6 +132,16 @@ def to_piango_musicxml(catalog: dict, exercise_id: str,
     fingers = FINGERING_REFERENCES.get(exercise_id) if fingering_reference else None
     if fingers is not None and (len(parts) != 1 or len(fingers) != len(spellings)):
         raise ValueError("fingering reference does not fit exercise")
+    realization = ex.get("realization") or {}
+    # Printed cues are the player's user-authored reference landmarks,
+    # never measurements or a universal fingering prescription.
+    cue_map = {
+        (cue["onset_index"], cue["hand"]): cue["finger"]
+        for cue in realization.get("finger_cues", [])
+    } if fingering_reference else {}
+    phase_starts = {
+        p["start"]: p["label"] for p in realization.get("phases", [])
+    }
     root = ET.Element("score-partwise", version="4.0")
     work = ET.SubElement(root, "work")
     ET.SubElement(work, "work-title").text = "Original practice: " + ex["title"]
@@ -149,8 +173,16 @@ def to_piango_musicxml(catalog: dict, exercise_id: str,
                     ET.SubElement(metro, "per-minute").text = str(ex["bpm"])
                     ET.SubElement(direction, "sound", tempo=str(ex["bpm"]))
             for event_index in range(start, start + per_measure):
+                if part_index == 0 and event_index in phase_starts:
+                    direction = ET.SubElement(measure, "direction")
+                    dtype = ET.SubElement(direction, "direction-type")
+                    ET.SubElement(dtype, "words").text = phase_starts[event_index]
                 written = events[event_index] if event_index < len(events) else None
-                finger = fingers[event_index] if fingers is not None and event_index < len(fingers) else None
+                hand = "right" if part_index == 0 else "left"
+                finger = (
+                    fingers[event_index] if fingers is not None and event_index < len(fingers)
+                    else cue_map.get((event_index, hand))
+                )
                 _write_note(measure, written, duration, kind, finger)
     ET.indent(root)
     return '<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(root, encoding="unicode") + "\n"

@@ -11,7 +11,7 @@ Practice is useful without a MIDI keyboard, DAW, song library, AI provider, clou
 | Capability | Status |
 | --- | --- |
 | Reproducible session proposals, one technique and one self-check | Implemented |
-| Nine technique areas: reading, hands together, minor/accidentals, triads, circle of fourths/fifths, four-note chords, pulse, keyboard navigation, dynamics | Implemented (two levels each) |
+| Eleven technique areas: reading, hands together, minor/accidentals, triads, circle of fourths/fifths, four-note chords, **arpeggios**, **two-hand scale patterns**, pulse, keyboard navigation, dynamics | Implemented (two levels each) |
 | Conservative rotation from approved history and explicit feedback | Implemented |
 | 15-, 20-, or 30-minute sessions, with a 5-minute fallback | Implemented |
 | USB MIDI port listing and bounded note/CC64 capture | Implemented, **hardware not qualified** |
@@ -19,7 +19,7 @@ Practice is useful without a MIDI keyboard, DAW, song library, AI provider, clou
 | Human-reviewed, revision-safe feedback application | Implemented, explicit approval required |
 | Context-bound feedback/v2 and separate progression gates | Implemented, explicit approval required |
 | MusicXML export of original reading and minor-key exercises | Implemented |
-| PianGo-compatible MusicXML export of all 18 exercises, optional annotated reference fingerings | Implemented; browser/device import unverified |
+| PianGo-compatible MusicXML export of all 22 exercises, optional annotated reference fingerings | Implemented; browser/device import unverified |
 | Alfred Level 1–2 and recital metadata catalog | Implemented (references only) |
 | Maintenance-due proposals from approved practice | Implemented |
 | Automatic mastery promotion, synchronized metronome, synthesis, UI, calendar notifications | Not implemented |
@@ -56,11 +56,15 @@ The competency progression vocabulary is `discovered → developing → reliable
 The [curriculum catalog](catalogs/curriculum.json) tracks goals beyond the initial timing drills:
 
 - **Sheet reading:** decode notes and accidentals from the printed staff, not just memorize key positions.
-- **Two-handed coordination:** build independence and simultaneous entries; MIDI cannot establish which hand played.
+- **Two-handed coordination:** build independence and simultaneous entries. Explicit onset groups distinguish sequential notes from intended LH/RH octave pairs, with separate beat timing and onset-synchronization checks. MIDI cannot establish which hand actually played.
 - **Circle of fourths/fifths:** navigate key relationships, key signatures, and root locations.
 - **Triads:** major/minor construction, inversions, and voice leading.
 - **Minor keys and accidentals:** natural vs harmonic minor, altered notes, and proper notation.
 - **Four-note chords:** build and voice lead Cmaj7, Am7, and related seventh-chord structures.
+- **Arpeggios:** practice C-major and A-minor broken chords through one and two octaves, identifying chord tones and thumb transfers.
+- **Two-hand scale choreography:** first establish parallel C-major scales with your reported LH finger-3 crossing in octave one and finger-4 crossing in octave two; then practice the five-phase parallel/reverse/contrary-motion pattern.
+
+The five-phase score is a **provisional authored realization** of your description, not proof of the exact registers you use. It starts LH C3 / RH C4; phase 2 makes the LH descend while RH continues upward and back (LH rests during the RH return). Confirm this interpretation against your physical routine before treating the reference fingering as canonical.
 
 Method references are **Alfred's Basic Adult Piano Course Levels One and Two**. Actual page progress, exercise names and privately owned scores stay in the local learner's notes; this public repository does not redistribute textbook material.
 
@@ -75,7 +79,22 @@ python3 -m piano_practice.cli notation --exercise reading-accidentals > local/re
 python3 -m piano_practice.cli notation --exercise minor-harmonic > local/minor-harmonic.musicxml
 ```
 
-The generated examples are original, single-staff note-reading material. They do **not** generate or copy editions of the named recital pieces, and they do not assess hands-together performance automatically. See [curriculum and recital planning](docs/curriculum.md).
+You can also export the arpeggios and two-handed scale exercises as original PianGo MusicXML, including printed left-hand crossing cues:
+
+```sh
+python3 -m piano_practice.cli export --target piango \
+  --exercise arpeggio-major-one-octave > local/arpeggio-major.musicxml
+
+python3 -m piano_practice.cli export --target piango \
+  --exercise scale-crossings-two-octaves --fingering-reference \
+  > local/scale-crossings.musicxml
+
+python3 -m piano_practice.cli export --target piango \
+  --exercise scale-five-phase-opposing --fingering-reference \
+  > local/five-phase-scales.musicxml
+```
+
+The `notation` examples are original single-staff note-reading material. PianGo `export` also supports separate LH/RH staves for the authored two-handed exercises. Neither path copies editions of the named recital pieces or automatically verifies physical hands-together technique. See [curriculum and recital planning](docs/curriculum.md).
 
 ### PianGo score export and fingering references
 

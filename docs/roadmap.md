@@ -2,7 +2,7 @@
 
 ## Implemented (software reference)
 
-- Technique-first catalog with **nine focus areas** and 18 bounded exercises: staff reading, two-handed coordination, fourths/fifths, triads, minor/accidentals, four-note harmony, pulse, navigation, dynamics
+- Technique-first catalog with **eleven focus areas** and 22 bounded exercises: staff reading, two-handed coordination, fourths/fifths, triads, minor/accidentals, four-note harmony, arpeggios, personal two-hand scale patterns, pulse, navigation, dynamics
 - Alfred's Basic Adult Piano Course Levels 1 and 2 as method-book *references*, not reproduced content
 - Recital *metadata* for Für Elise, Over the Rainbow, and Jacob's Ladder; arrangement and page progress unknown
 - Explicit Tuesday/Thursday planning preference, injected-date deterministic technique rotation, 15/20/30-minute plans, five-block flow and five-minute fallback
@@ -30,3 +30,8 @@
 ## Non-goals
 
 Hosted subscriptions, mandatory AI services, uploading private practice logs, automatic injury/fingering diagnosis, automatic mastery claims from MIDI, copyrighted Alfred reproductions, or unapproved remote device changes.
+
+
+### Personal technique follow-up
+
+The authored five-phase scale pattern is provisionally mapped in C major; physical starting octaves, contrary-motion geometry, and the LH 3→4 crossing references require direct player/teacher confirmation. The reference score and named phase metadata are not a finger-detection system. Transposing these patterns to additional keys and adding left/right-specific fingering recommendations remains an opt-in later enhancement.

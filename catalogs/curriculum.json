@@ -67,6 +67,24 @@
       "method_book_ids": [
         "alfred-basic-adult-2"
       ]
+    },
+    {
+      "id": "arpeggio-fluency",
+      "technique_id": "arpeggios",
+      "intent": "Name chord tones and play major/minor arpeggios through octave changes with relaxed thumb transfer",
+      "method_book_ids": [
+        "alfred-basic-adult-1",
+        "alfred-basic-adult-2"
+      ]
+    },
+    {
+      "id": "two-handed-scale-choreography",
+      "technique_id": "scale-patterns",
+      "intent": "Practice two-octave left-hand crossings, parallel and contrary-motion scales, and a five-phase personal pattern",
+      "method_book_ids": [
+        "alfred-basic-adult-1",
+        "alfred-basic-adult-2"
+      ]
     }
   ],
   "repertoire": [
@@ -80,7 +98,9 @@
       "focus_techniques": [
         "reading",
         "coordination",
-        "minor"
+        "minor",
+        "arpeggios",
+        "scale-patterns"
       ],
       "rights": "The original composition is public-domain; exact edition/arrangement must be checked before redistribution."
     },
@@ -108,7 +128,8 @@
       "focus_techniques": [
         "reading",
         "coordination",
-        "triads"
+        "triads",
+        "arpeggios"
       ],
       "rights": "Rights for the specific arrangement are unknown; do not commit its score."
     }

@@ -220,7 +220,76 @@
         "Alternate hands, one note per beat, with no extra gap at hand changes.",
         "A MIDI recording cannot prove which hand you used; self-check explicitly."
       ],
-      "self_check": "Were your hands coordinated with an even pulse and minimal tension?"
+      "self_check": "Were your hands coordinated with an even pulse and minimal tension?",
+      "realization": {
+        "contract_version": "onset-groups/v1",
+        "onsets": [
+          {
+            "pitches": [
+              48
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              60
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              62
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              64
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53
+            ],
+            "hands": [
+              "left"
+            ]
+          },
+          {
+            "pitches": [
+              65
+            ],
+            "hands": [
+              "right"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "coordination-together",
@@ -246,7 +315,52 @@
         "Then play matched octave pairs together as a separate musical-context task.",
         "Use self-report/recording, not the sequential MIDI gate, to assess simultaneity."
       ],
-      "self_check": "Did both hands begin the octave pairs together without one hand dragging?"
+      "self_check": "Did both hands begin the octave pairs together without one hand dragging?",
+      "realization": {
+        "contract_version": "onset-groups/v1",
+        "onsets": [
+          {
+            "pitches": [
+              48,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              64
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              67
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              48,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "circle-fourths",
@@ -464,6 +578,1036 @@
         "Pay attention to hand span; do not stretch through discomfort."
       ],
       "self_check": "Did you move between voicings smoothly while identifying the inversion?"
+    },
+    {
+      "id": "arpeggio-major-one-octave",
+      "technique_id": "arpeggios",
+      "level": 0,
+      "title": "C major triad arpeggio, ascending and descending",
+      "notes": [
+        60,
+        64,
+        67,
+        72,
+        67,
+        64,
+        60
+      ],
+      "bpm": 54,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Name the C major chord tones C-E-G before playing.",
+        "Play the arpeggio up to the octave and back, deliberately releasing each note.",
+        "Focus on relaxed thumb transfer and even notes; use your own licensed score for repertoire examples."
+      ],
+      "self_check": "Can you identify root, third and fifth, and play without tension?"
+    },
+    {
+      "id": "arpeggio-major-minor-two-octaves",
+      "technique_id": "arpeggios",
+      "level": 1,
+      "title": "Two-octave C major and A minor arpeggio patterns",
+      "notes": [
+        60,
+        64,
+        67,
+        72,
+        76,
+        79,
+        84,
+        79,
+        76,
+        72,
+        67,
+        64,
+        60,
+        57,
+        60,
+        64,
+        69,
+        72,
+        76,
+        81,
+        76,
+        72,
+        69,
+        64,
+        60,
+        57
+      ],
+      "bpm": 48,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Play C major C-E-G over two octaves, returning to the start.",
+        "Then play A minor A-C-E over two octaves and return.",
+        "Compare major/minor thirds; mark thumb-under passages but never force a stretch."
+      ],
+      "self_check": "Could you hear and explain the major versus minor third and keep both phrases relaxed?"
+    },
+    {
+      "id": "scale-crossings-two-octaves",
+      "technique_id": "scale-patterns",
+      "level": 0,
+      "title": "Hands-together C-major scale with LH crossing landmarks",
+      "notes": [
+        48,
+        60,
+        50,
+        62,
+        52,
+        64,
+        53,
+        65,
+        55,
+        67,
+        57,
+        69,
+        59,
+        71,
+        60,
+        72,
+        62,
+        74,
+        64,
+        76,
+        65,
+        77,
+        67,
+        79,
+        69,
+        81,
+        71,
+        83,
+        72,
+        84
+      ],
+      "bpm": 50,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Play the C-major scale up two octaves with both hands, starting LH C3 and RH C4.",
+        "At the first LH thumb-crossing, check finger 3; at the next, check finger 4. These are the user's reported reference landmarks, not universally prescribed fingering.",
+        "Name each hand's notes and observe relaxed wrists. MIDI can measure synchrony but not which fingers were used."
+      ],
+      "self_check": "Could you identify the left-hand crossing at finger 3, then finger 4, without tension?",
+      "realization": {
+        "contract_version": "onset-groups/v1",
+        "onsets": [
+          {
+            "pitches": [
+              48,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50,
+              62
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              64
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53,
+              65
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              67
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              57,
+              69
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              59,
+              71
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              60,
+              72
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              62,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              64,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              65,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              67,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              69,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              71,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              72,
+              84
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "id": "parallel-two-octaves",
+            "label": "Hands together up two octaves",
+            "start": 0,
+            "end": 15
+          }
+        ],
+        "finger_cues": [
+          {
+            "onset_index": 5,
+            "hand": "left",
+            "finger": 3,
+            "label": "LH crossing to finger 3 in octave one"
+          },
+          {
+            "onset_index": 8,
+            "hand": "left",
+            "finger": 4,
+            "label": "LH crossing to finger 4 in octave two"
+          }
+        ]
+      }
+    },
+    {
+      "id": "scale-five-phase-opposing",
+      "technique_id": "scale-patterns",
+      "level": 1,
+      "title": "Five-phase parallel and contrary-motion scale choreography",
+      "notes": [
+        48,
+        60,
+        50,
+        62,
+        52,
+        64,
+        53,
+        65,
+        55,
+        67,
+        57,
+        69,
+        59,
+        71,
+        60,
+        72,
+        59,
+        74,
+        57,
+        76,
+        55,
+        77,
+        53,
+        79,
+        52,
+        81,
+        50,
+        83,
+        48,
+        84,
+        83,
+        81,
+        79,
+        77,
+        76,
+        74,
+        72,
+        50,
+        74,
+        52,
+        76,
+        53,
+        77,
+        55,
+        79,
+        57,
+        81,
+        59,
+        83,
+        60,
+        84,
+        59,
+        83,
+        57,
+        81,
+        55,
+        79,
+        53,
+        77,
+        52,
+        76,
+        50,
+        74,
+        48,
+        72,
+        47,
+        74,
+        45,
+        76,
+        43,
+        77,
+        41,
+        79,
+        40,
+        81,
+        38,
+        83,
+        36,
+        84,
+        38,
+        83,
+        40,
+        81,
+        41,
+        79,
+        43,
+        77,
+        45,
+        76,
+        47,
+        74,
+        48,
+        72,
+        47,
+        71,
+        45,
+        69,
+        43,
+        67,
+        41,
+        65,
+        40,
+        64,
+        38,
+        62,
+        36,
+        60
+      ],
+      "bpm": 48,
+      "subdivision": 1,
+      "dynamics": null,
+      "assessment_mode": "human",
+      "instructions": [
+        "Provisional C-major rendition of the player's described drill; confirm starting octaves and reversals against the player's physical technique.",
+        "1. Both hands ascend one octave together.",
+        "2. LH reverses downward as RH ascends another octave, then RH returns while LH pauses.",
+        "3. Both hands ascend an octave and return together.",
+        "4. Both hands move outward in contrary motion by one octave and return.",
+        "5. Both hands descend an octave together.",
+        "Review the hand-specific transitions and finger crossings with a teacher or score; do not equate MIDI-pitch accuracy with technique."
+      ],
+      "self_check": "Could you complete all five phases with even timing, clear reversals and comfortable crossings?",
+      "realization": {
+        "contract_version": "onset-groups/v1",
+        "onsets": [
+          {
+            "pitches": [
+              48,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50,
+              62
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              64
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53,
+              65
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              67
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              57,
+              69
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              59,
+              71
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              60,
+              72
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              59,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              57,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              48,
+              84
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              83
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              81
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              79
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              77
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              76
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              74
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              72
+            ],
+            "hands": [
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              57,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              59,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              60,
+              84
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              59,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              57,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              55,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              53,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              52,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              50,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              48,
+              72
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              47,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              45,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              43,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              41,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              40,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              38,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              36,
+              84
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              38,
+              83
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              40,
+              81
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              41,
+              79
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              43,
+              77
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              45,
+              76
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              47,
+              74
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              48,
+              72
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              47,
+              71
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              45,
+              69
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              43,
+              67
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              41,
+              65
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              40,
+              64
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              38,
+              62
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          },
+          {
+            "pitches": [
+              36,
+              60
+            ],
+            "hands": [
+              "left",
+              "right"
+            ]
+          }
+        ],
+        "phases": [
+          {
+            "id": "parallel-up",
+            "label": "Both hands ascend together one octave",
+            "start": 0,
+            "end": 8
+          },
+          {
+            "id": "left-reverses-right-extends",
+            "label": "LH descends while RH ascends another octave, then RH returns while LH rests",
+            "start": 8,
+            "end": 22
+          },
+          {
+            "id": "parallel-up-return",
+            "label": "Both hands ascend one octave and return",
+            "start": 22,
+            "end": 36
+          },
+          {
+            "id": "contrary-out-return",
+            "label": "LH descends while RH ascends; both return",
+            "start": 36,
+            "end": 50
+          },
+          {
+            "id": "parallel-down",
+            "label": "Both hands descend one octave",
+            "start": 50,
+            "end": 57
+          }
+        ],
+        "finger_cues": [
+          {
+            "onset_index": 5,
+            "hand": "left",
+            "finger": 3,
+            "label": "LH first-octave crossing; review with teacher"
+          },
+          {
+            "onset_index": 26,
+            "hand": "left",
+            "finger": 3,
+            "label": "LH crossing while repeating upward scale"
+          }
+        ]
+      }
     }
   ]
 }

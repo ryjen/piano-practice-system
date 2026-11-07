@@ -1,7 +1,10 @@
 """Deterministic assessment of *key MIDI events*, not physical technique."""
 from __future__ import annotations
 
+from collections import Counter
+
 from .core import validate_catalog
+from .timeline import onset_groups
 
 
 def assess(take: dict, catalog: dict) -> dict:
@@ -52,20 +55,48 @@ def assess(take: dict, catalog: dict) -> dict:
                 active.remove(key)
     if active:
         errors.append("unreleased_notes")
-    played = [ev["note"] for ev in onsets]
+    groups = onset_groups(ex)
     expected = ex["notes"]
-    pitches = "pass" if played == expected else "fail"
+    # Match each expected onset group as a multiset: a nearly simultaneous
+    # RH/LH pair may arrive in either transport order. Single-note groups
+    # preserve the legacy sequential pitch assessment.
+    observed_groups = []
+    cursor = 0
+    pitch_match = len(onsets) == len(expected)
+    for group in groups:
+        span = len(group["pitches"])
+        observed = onsets[cursor:cursor + span]
+        cursor += span
+        observed_groups.append(observed)
+        if Counter(n["note"] for n in observed) != Counter(group["pitches"]):
+            pitch_match = False
+    pitches = "pass" if pitch_match else "fail"
     declared_bpm = take.get("bpm", ex["bpm"])
     if type(declared_bpm) is not int or not 40 <= declared_bpm <= 180:
         raise ValueError("declared bpm must be an integer from 40 to 180")
     target_interval = 60000.0 / declared_bpm / ex["subdivision"]
-    gaps = [onsets[i+1]["t_ms"] - onsets[i]["t_ms"] for i in range(len(onsets)-1)]
+    all_group_notes_present = (
+        len(onsets) == len(expected) and
+        all(len(actual) == len(group["pitches"])
+            for actual, group in zip(observed_groups, groups))
+    )
+    group_starts = [min(n["t_ms"] for n in group)
+                    for group in observed_groups if group]
+    gaps = [group_starts[i+1] - group_starts[i]
+            for i in range(len(group_starts)-1)]
     deviation = max((abs(g - target_interval) for g in gaps), default=None)
-    # Use a bounded absolute tolerance at slow tempo, and a relative tolerance
-    # at fast subdivisions. A fixed 180 ms gate can accept collapsed notes.
     timing_tolerance_ms = min(120.0, target_interval * 0.25)
-    timing = "unknown" if len(gaps) != len(expected)-1 else (
+    timing = "unknown" if not all_group_notes_present or len(group_starts) != len(groups) else (
         "pass" if deviation is not None and deviation <= timing_tolerance_ms else "fail"
+    )
+    polyphonic = any(len(group["pitches"]) > 1 for group in groups)
+    synchronization_tolerance_ms = min(80.0, target_interval * 0.1)
+    spreads = [max(n["t_ms"] for n in actual) - min(n["t_ms"] for n in actual)
+               for actual in observed_groups if len(actual) > 1]
+    synchronization = "not-applicable" if not polyphonic else (
+        "unknown" if not all_group_notes_present else
+        "pass" if all(spread <= synchronization_tolerance_ms for spread in spreads)
+        else "fail"
     )
     lifecycle = "pass" if not errors else "fail"
     dynamics = "not-applicable"
@@ -83,6 +114,7 @@ def assess(take: dict, catalog: dict) -> dict:
     checks = {
         "pitch_sequence": pitches,
         "inter_onset_intervals": timing,
+        "within_group_sync": synchronization,
         "note_lifecycle": lifecycle,
         "relative_dynamics": dynamics,
     }
@@ -99,6 +131,8 @@ def assess(take: dict, catalog: dict) -> dict:
         "declared_bpm": declared_bpm,
         "target_interval_ms": round(target_interval, 3),
         "timing_tolerance_ms": round(timing_tolerance_ms, 3),
+        "synchronization_tolerance_ms": round(synchronization_tolerance_ms, 3),
+        "max_within_group_spread_ms": max(spreads, default=None),
         "max_interval_deviation_ms": None if deviation is None else round(deviation, 3),
         "lifecycle_errors": sorted(set(errors)),
         "limitations": [
