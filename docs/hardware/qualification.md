@@ -25,3 +25,8 @@
 `pianoctl hardware` produces a **trace integrity report**, never `physical_device_qualified: true`. Even a perfect synthetic MIDI file proves only that its contents are well-formed. Physical qualification requires a separate dated, human-verifiable local-device test result. Do not close [issue #2](https://github.com/ryjen/piano-practice-system/issues/2) until those checks have been executed.
 
 A passed trace cannot establish physical key assignment, hand identity, motor technique, acoustic sound, or suitability of an arrangement. Failure on port enumeration can reflect container permissions rather than a broken keyboard.
+
+
+The MIDI assessor rejects any negative or noninteger event timestamp, including
+the first event. A structurally valid take is still only advisory evidence,
+not physical Oxygen Pro 61 qualification.

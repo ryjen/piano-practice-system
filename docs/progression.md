@@ -71,3 +71,17 @@ The planner prioritizes due maintenance before ordinary technique rotation. Cale
 Practice history, recitals, recording references and inferred capability details are personal. Store actual state under ignored `local/`, never in public examples. No AI inference, hosted account, or external service is required.
 
 See [curriculum](curriculum.md), [Oxygen hardware qualification](hardware/qualification.md), and [contracts](../contracts/v1/README.md).
+
+
+## Lesson recommendations and maintenance queue ordering
+
+A suggested level-one exercise is **not** an approved competency transition.
+The planner counts two distinct, comfortable, non-hard foundation practice days
+**strictly after** the latest adverse feedback day for that technique (including
+an adverse report from an advanced exercise). A same-day retry cannot establish
+new multi-day repeatability.
+
+The maintenance queue prioritizes an explicitly adverse recovery item ahead
+of routine overdue verification, then sorts by due date and technique ID within
+each class. This is deterministic triage, not a claim that one technique should
+be ignored indefinitely; scheduling fairness remains a separate policy concern.

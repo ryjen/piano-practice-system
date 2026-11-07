@@ -21,7 +21,8 @@ def assess(take: dict, catalog: dict) -> dict:
     errors = []
     last_time = -1
     for ev in events:
-        if not isinstance(ev, dict) or type(ev.get("t_ms")) is not int or ev["t_ms"] < last_time:
+        if (not isinstance(ev, dict) or type(ev.get("t_ms")) is not int
+                or ev["t_ms"] < 0 or ev["t_ms"] < last_time):
             raise ValueError("events require nondecreasing integer t_ms")
         last_time = ev["t_ms"]
         kind = ev.get("type")

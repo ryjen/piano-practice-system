@@ -17,6 +17,15 @@ class MidiAssessmentTests(unittest.TestCase):
         self.catalog = load("catalogs/exercises.json")
         self.take = load("examples/midi-takes/pulse-quarter-pass.json")
 
+    def test_negative_or_non_integer_timestamps_fail_closed(self):
+        for invalid in (-1, -100, True, 1.5, float("nan")):
+            with self.subTest(value=str(invalid)):
+                take = copy.deepcopy(self.take)
+                take["events"][0]["t_ms"] = invalid
+                with self.assertRaisesRegex(ValueError, "nondecreasing integer"):
+                    assess(take, self.catalog)
+        self.assertTrue(assess(self.take, self.catalog)["pass"])
+
     def test_synthetic_steady_pulse_passes(self):
         r = assess(self.take, self.catalog)
         self.assertTrue(r["pass"])

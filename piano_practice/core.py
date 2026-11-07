@@ -104,21 +104,28 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
     if len(foundation) != 1 or len(advanced) != 1:
         raise ValueError("each technique needs one exercise at each level")
     foundation = foundation[0]
+    # Both the lesson recommendation and the formal competency gate must
+    # reset after adverse evidence. Count only distinct foundation days strictly
+    # after the newest adverse day for this technique. Same-day successes do not
+    # demonstrate repeatability after a failure.
+    technique_history = [
+        s for s in active
+        if by_id[s["exercise_id"]]["technique_id"] == focus
+    ]
+    adverse_dates = [
+        s["date"] for s in technique_history
+        if s["passed"] is False or s["comfort"] == "tension"
+        or s["feedback"] == "hard"
+    ]
+    latest_adverse = max(adverse_dates, default="")
     successful_dates = {
-        s["date"] for s in active
+        s["date"] for s in technique_history
         if s["exercise_id"] == foundation["id"]
         and s["passed"] is True and s["comfort"] == "comfortable"
+        and s["feedback"] != "hard"
+        and s["date"] > latest_adverse
     }
-    foundation_history = sorted(
-        (s for s in active if s["exercise_id"] == foundation["id"]),
-        key=lambda s: s["date"],
-    )
-    latest_foundation = foundation_history[-1] if foundation_history else None
-    regression_signal = latest_foundation is not None and (
-        latest_foundation["feedback"] == "hard"
-        or latest_foundation["comfort"] == "tension"
-        or latest_foundation["passed"] is False
-    )
+    regression_signal = bool(latest_adverse) and len(successful_dates) < 2
     maintenance_recovery = bool(due and due[0].get("reason") == "adverse-feedback")
     # Recovery always outranks ordinary advancement, even when historical
     # foundation successes would otherwise select the advanced exercise.

@@ -116,6 +116,39 @@ class PlannerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "session must be"):
             validate_state(self.state, self.catalog)
 
+    def test_level_advance_resets_after_failure_and_requires_two_new_days(self):
+        self.add("2026-11-01", "pulse-quarter")
+        self.add("2026-11-02", "pulse-quarter", feedback="hard", passed=False)
+        self.add("2026-11-03", "pulse-quarter")
+        self.add("2026-11-04", "navigation-steps")
+        self.add("2026-11-05", "dynamics-contrast")
+        first = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(first["exercise_id"], "pulse-quarter")
+        self.add("2026-11-06", "pulse-quarter")
+        self.add("2026-11-07", "navigation-steps")
+        self.add("2026-11-08", "dynamics-contrast")
+        resumed = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(resumed["exercise_id"], "pulse-eighth")
+
+    def test_adverse_hard_success_resets_lesson_gate(self):
+        self.add("2026-11-01", "pulse-quarter")
+        self.add("2026-11-02", "pulse-quarter")
+        self.add("2026-11-03", "pulse-quarter",
+                 feedback="hard", passed=True, comfort="comfortable")
+        self.add("2026-11-04", "navigation-steps")
+        self.add("2026-11-05", "dynamics-contrast")
+        self.assertEqual(
+            propose(self.catalog, self.state, self.config, "2026-11-10")["exercise_id"],
+            "pulse-quarter"
+        )
+        self.add("2026-11-06", "pulse-quarter")
+        self.add("2026-11-07", "navigation-steps")
+        self.add("2026-11-08", "dynamics-contrast")
+        self.assertEqual(
+            propose(self.catalog, self.state, self.config, "2026-11-10")["exercise_id"],
+            "pulse-quarter"
+        )
+
     def test_reproducible_and_unchanged_inputs(self):
         before = copy.deepcopy(self.state)
         a = propose(self.catalog, self.state, self.config, "2026-11-10")
