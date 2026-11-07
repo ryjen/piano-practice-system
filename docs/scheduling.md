@@ -1,8 +1,8 @@
 # Goal-weighted practice scheduling (optional)
 
 The system starts with a user-authored goal map, not inferred skill levels.
-The default configuration gives additional attention to **sheet reading (4)**,
-**two-hand coordination (4)**, **arpeggios (3)**, and
+The default configuration makes **sheet reading (5)** the highest priority,
+followed by **two-hand coordination (4)**, **arpeggios (3)**, and
 **scale choreography (3)**. Other technique weights are lower (1–2).
 The numbers are priorities, not competence ratings.
 
@@ -34,7 +34,7 @@ is needed.
 
 ## Bounded preparation, not extra session time
 
-`warmups` are optional short prompts (one minute of reading and one minute
+`warmups` are optional short prompts (two minutes of cold staff reading and one minute
 of two-hand coordination in the default config). They are **inside** the
 original `prepare` stage and must not exceed its allocated minutes.
 They are not a second primary technique or an automatically verified task.
@@ -75,3 +75,5 @@ change, and review the generated priority scores.
 
 Stop or simplify practice for discomfort. No silent mastery, recurring
 notifications, calendar writes, auto-uploaded recordings, or paid integrations.
+
+The reading-first priority is a configuration choice, not an inferred learner diagnosis. The separate [reading trainer milestone](reading.md) is designed to provide unseen notation and immediate keyboard feedback; existing fixed exercises and the offline MIDI assessor alone cannot demonstrate true sight-reading.

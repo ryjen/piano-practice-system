@@ -22,7 +22,7 @@
   ],
   "maintenance_interval_days": 14,
   "goal_weights": {
-    "reading": 4,
+    "reading": 5,
     "coordination": 4,
     "scale-patterns": 3,
     "arpeggios": 3,
@@ -37,8 +37,8 @@
   "warmups": [
     {
       "technique_id": "reading",
-      "minutes": 1,
-      "prompt": "Name three written notes and one rhythm before playing."
+      "minutes": 2,
+      "prompt": "Sight-read an unseen staff note or short fragment, then find its key; avoid showing letter names first."
     },
     {
       "technique_id": "coordination",

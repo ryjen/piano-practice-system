@@ -37,6 +37,17 @@ class CurriculumTests(unittest.TestCase):
             )
         self.assertEqual(len(self.catalog["exercises"]), 22)
 
+    def test_chord_wrist_reminders_stay_human_observed(self):
+        ids = {"triads-root", "triads-inversions",
+               "four-note-arpeggio", "four-note-inversions"}
+        for ex in self.catalog["exercises"]:
+            if ex["id"] in ids:
+                with self.subTest(ex=ex["id"]):
+                    instructions = " ".join(ex["instructions"])
+                    self.assertIn("small, comfortable wrist movement", instructions)
+                    self.assertIn("avoid locking the wrist", instructions)
+                    self.assertEqual(ex["assessment_mode"], "human")
+
     def test_method_books_and_recital_examples_reference_known_techniques(self):
         ids = [x["id"] for x in self.curriculum["repertoire"]]
         self.assertEqual(ids, ["fur-elise", "over-the-rainbow", "jacobs-ladder"])

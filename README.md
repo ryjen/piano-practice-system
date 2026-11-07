@@ -2,7 +2,7 @@
 
 **Status:** deterministic, local-first reference implementation. Software CI is passing; physical **M-Audio Oxygen Pro 61** qualification is outstanding.
 
-A technique-first piano practice system modeled on [ryjen/guitar-practice-system](https://github.com/ryjen/guitar-practice-system). It answers: **What single technique should I work on next, how should I practice it, and what evidence would justify changing the plan?**
+A **reading-first** piano practice system, with technique as supporting practice, modeled on [ryjen/guitar-practice-system](https://github.com/ryjen/guitar-practice-system). It answers: **What single technique should I work on next, how should I practice it, and what evidence would justify changing the plan?**
 
 Practice is useful without a MIDI keyboard, DAW, song library, AI provider, cloud service, or account. MIDI is optional supporting evidence, not an authoritative teacher.
 
@@ -26,7 +26,7 @@ Practice is useful without a MIDI keyboard, DAW, song library, AI provider, clou
 
 The preferred Tuesday/Thursday evening cadence is recorded in [config/practice.json](config/practice.json) (`America/Vancouver`, 19:00, 20 minutes). **It does not create notifications or calendar events.** Invoke the planner for a specific date.
 
-The optional **goal-weighted scheduler** prioritizes reading and hands-together coordination, with additional emphasis on arpeggios and scale-pattern work. It uses explicit integer weights and time since each approved session, never guesses proficiency. The short reading/coordination warm-ups are **inside the existing preparation minutes**, not extra practice time. Remove `goal_weights` to restore legacy least-recently-practiced ordering. See [scheduling policy](docs/scheduling.md).
+The optional **goal-weighted scheduler** prioritizes **reading first**, followed by hands-together coordination, arpeggios and scale-pattern work. It uses explicit integer weights and time since each approved session, never guesses proficiency. The short reading/coordination warm-ups are **inside the existing preparation minutes**, not extra practice time. Remove `goal_weights` to restore legacy least-recently-practiced ordering. See [scheduling policy](docs/scheduling.md).
 
 ## Mental model
 
@@ -52,6 +52,18 @@ flowchart LR
 ```
 
 The competency progression vocabulary is `discovered → developing → reliable-isolation → reliable-context → maintained`; `paused` and `retired` are separate lifecycle states. The planner may suggest a next-level exercise after **two distinct, approved, comfortable successful foundation sessions**. Separately, the `progression` command evaluates context-bound evidence and proposes explicitly approved competency-state transitions; MIDI scores alone never promote a technique.
+
+## Main learning goal: read the score, then play the keyboard
+
+**Reading unfamiliar staff notation is the first priority.** The watch note-guessing exercise can reinforce recognition, but the next step is a closed-loop physical-keyboard drill: display a new written note or short phrase **without spelling its name or highlighting the answer**, wait for an actual MIDI note-on, then give exact pitch/octave/accidental feedback. Gradually mix treble and bass clefs, intervals, rhythms, and both hands.
+
+This application is **not yet implemented** in this repository; the existing MIDI assessor evaluates a completed take and cannot establish that it was read from a score. In the meantime, [Pianomi](https://pianomi.app/) offers staff reading with connected MIDI input and fresh exercises. The existing [PianGo export](docs/piango.md) is more appropriate for learning a known score and finger positions; revealing the correct key in advance is counterproductive when testing independent reading. Third-party browser data handling and hardware compatibility should be assessed separately.
+
+The default config now makes reading the **highest goal weight (5/5)** and reserves two of the existing three preparation minutes for a short cold-reading exercise; the remaining minute stays with two-hand coordination. This does not create new practice time or an external service. See [reading-first practice and planned MIDI interaction](docs/reading.md).
+
+## Teaching acknowledgement
+
+Selected practice ideas, method-book choices, and the cue to use a **small, relaxed wrist movement when sounding and releasing chords** reflect guidance from piano teacher **Shirly Mann**. This independent software reference is not authored, reviewed, or endorsed by her. A wrist cue is a player/teacher observation, not MIDI-detected physical technique.
 
 ## Curriculum and recital context
 

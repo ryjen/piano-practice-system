@@ -78,7 +78,12 @@ class WeightedPracticePlanTests(unittest.TestCase):
         self.assertEqual(len(first["selection"]["candidate_scores"]), 11)
         self.assertEqual([s["technique_id"] for s in first["warmups_within_prepare"]],
                          ["reading", "coordination"])
-        self.assertEqual(sum(s["minutes"] for s in first["warmups_within_prepare"]), 2)
+        self.assertEqual(sum(s["minutes"] for s in first["warmups_within_prepare"]), 3)
+        self.assertEqual(first["warmups_within_prepare"][0]["minutes"], 2)
+        self.assertEqual(self.config["goal_weights"]["reading"], 5)
+        self.assertGreater(self.config["goal_weights"]["reading"],
+                           max(w for t, w in self.config["goal_weights"].items()
+                               if t != "reading"))
         self.assertEqual(sum(s["minutes"] for s in first["stages"]), 20)
 
     def test_manual_focus_override_and_bad_focus_fail_closed(self):
