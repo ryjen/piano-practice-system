@@ -1,0 +1,91 @@
+import copy
+import json
+import unittest
+from pathlib import Path
+
+from piano_practice.core import propose, validate_catalog
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def load(p):
+    return json.loads((ROOT / p).read_text(encoding="utf-8"))
+
+
+class PlannerTests(unittest.TestCase):
+    def setUp(self):
+        self.catalog = load("catalogs/exercises.json")
+        self.config = load("config/practice.json")
+        self.state = load("examples/learner-state.json")
+
+    def add(self, date, exercise, feedback="appropriate", passed=True,
+            comfort="comfortable", approved=True):
+        self.state["sessions"].append(dict(
+            date=date, exercise_id=exercise, feedback=feedback,
+            passed=passed, comfort=comfort, approved=approved
+        ))
+
+    def test_catalog_is_valid(self):
+        validate_catalog(self.catalog)
+
+    def test_first_session_has_no_proficiency_assumption(self):
+        p = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(p["exercise_id"], "pulse-quarter")
+        self.assertEqual(p["state_revision"], 0)
+        self.assertEqual(sum(s["minutes"] for s in p["stages"]), 20)
+        self.assertEqual(p["fallback_minutes"], 5)
+
+    def test_rotation_prefers_unpracticed_technique(self):
+        self.add("2026-11-10", "pulse-quarter")
+        self.assertEqual(propose(self.catalog, self.state, self.config, "2026-11-12")["exercise_id"],
+                         "navigation-steps")
+        self.add("2026-11-12", "navigation-steps")
+        self.assertEqual(propose(self.catalog, self.state, self.config, "2026-11-17")["exercise_id"],
+                         "dynamics-contrast")
+
+    def test_two_distinct_approved_days_are_required_to_advance(self):
+        self.add("2026-11-03", "pulse-quarter")
+        self.add("2026-11-03", "pulse-quarter")
+        self.add("2026-11-04", "navigation-steps")
+        self.add("2026-11-05", "dynamics-contrast")
+        self.assertEqual(propose(self.catalog, self.state, self.config, "2026-11-10")["exercise_id"],
+                         "pulse-quarter")
+        self.add("2026-11-06", "pulse-quarter")
+        self.add("2026-11-07", "navigation-steps")
+        self.add("2026-11-08", "dynamics-contrast")
+        self.assertEqual(propose(self.catalog, self.state, self.config, "2026-11-10")["exercise_id"],
+                         "pulse-eighth")
+
+    def test_hard_feedback_simplifies_not_promotes(self):
+        self.add("2026-11-03", "pulse-quarter", feedback="hard", passed=False)
+        self.add("2026-11-04", "navigation-steps")
+        self.add("2026-11-05", "dynamics-contrast")
+        proposal = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(proposal["exercise_id"], "pulse-quarter")
+        self.assertEqual(proposal["bpm"], 55)
+
+    def test_unapproved_or_future_feedback_has_no_effect(self):
+        self.add("2026-11-01", "pulse-quarter", approved=False)
+        self.add("2026-11-20", "pulse-quarter")
+        proposal = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(proposal["exercise_id"], "pulse-quarter")
+        self.assertEqual(proposal["bpm"], 60)
+
+    def test_unknown_comfort_does_not_count_as_verified_success(self):
+        for day in ("2026-11-01", "2026-11-02"):
+            self.add(day, "pulse-quarter", comfort="unknown")
+        self.add("2026-11-03", "navigation-steps")
+        self.add("2026-11-04", "dynamics-contrast")
+        self.assertEqual(propose(self.catalog, self.state, self.config, "2026-11-10")["exercise_id"],
+                         "pulse-quarter")
+
+    def test_reproducible_and_unchanged_inputs(self):
+        before = copy.deepcopy(self.state)
+        a = propose(self.catalog, self.state, self.config, "2026-11-10")
+        b = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(a, b)
+        self.assertEqual(before, self.state)
+
+
+if __name__ == "__main__":
+    unittest.main()

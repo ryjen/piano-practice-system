@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "exercises": [
+    {
+      "id": "pulse-quarter",
+      "technique_id": "pulse",
+      "level": 0,
+      "title": "Four steady pulses on C",
+      "notes": [
+        60,
+        60,
+        60,
+        60
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": null,
+      "instructions": [
+        "Find the key sending MIDI note 60 (middle C).",
+        "Count aloud 1-2-3-4 and play one note per beat with either hand.",
+        "Leave small, comfortable space between notes. Repeat three times; pause if tense."
+      ],
+      "self_check": "Can you play three four-note passes at an even pulse without discomfort?"
+    },
+    {
+      "id": "pulse-eighth",
+      "technique_id": "pulse",
+      "level": 1,
+      "title": "Eight even subdivisions",
+      "notes": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "bpm": 60,
+      "subdivision": 2,
+      "dynamics": null,
+      "instructions": [
+        "Use C4 / MIDI note 60.",
+        "Count 1-and-2-and-3-and-4-and. Play one note per count.",
+        "Do not accelerate during the second half; retain relaxed release."
+      ],
+      "self_check": "Were the eight attacks evenly spaced at the chosen tempo?"
+    },
+    {
+      "id": "navigation-steps",
+      "technique_id": "navigation",
+      "level": 0,
+      "title": "Five-key stepwise motion",
+      "notes": [
+        60,
+        62,
+        64,
+        65,
+        67,
+        65,
+        64,
+        62,
+        60
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": null,
+      "instructions": [
+        "Locate consecutive white keys C-D-E-F-G.",
+        "Move upward and back down, one note per click, separately with either hand.",
+        "Keep the motion light; fingering can be chosen to fit your comfort."
+      ],
+      "self_check": "Can you repeat the direction changes cleanly and comfortably?"
+    },
+    {
+      "id": "navigation-skips",
+      "technique_id": "navigation",
+      "level": 1,
+      "title": "Small keyboard skips",
+      "notes": [
+        60,
+        64,
+        62,
+        65,
+        64,
+        67
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": null,
+      "instructions": [
+        "Locate C-D-E-F-G.",
+        "Play C-E, D-F, E-G as six separate notes, one per beat.",
+        "Aim for accurate landings without looking down at every motion."
+      ],
+      "self_check": "Were the interval skips accurate without a strained wrist?"
+    },
+    {
+      "id": "dynamics-contrast",
+      "technique_id": "dynamics",
+      "level": 0,
+      "title": "Soft and strong on one note",
+      "notes": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": "alternate",
+      "instructions": [
+        "Play MIDI note 60 six times on an even beat.",
+        "Alternate soft and a moderately stronger attack, avoiding harsh or forced motion.",
+        "Listen for contrast before examining MIDI velocity readings."
+      ],
+      "self_check": "Could you hear three soft-strong pairs without tension?"
+    },
+    {
+      "id": "dynamics-phrase",
+      "technique_id": "dynamics",
+      "level": 1,
+      "title": "Dynamics across a small phrase",
+      "notes": [
+        60,
+        62,
+        64,
+        65,
+        67,
+        65,
+        64,
+        62
+      ],
+      "bpm": 60,
+      "subdivision": 1,
+      "dynamics": "alternate",
+      "instructions": [
+        "Play C-D-E-F-G-F-E-D, one note per beat.",
+        "Alternate softer and stronger attacks while keeping pitch and time stable.",
+        "Treat the contrast as phrasing, not a force or speed test."
+      ],
+      "self_check": "Did the expression remain deliberate across the moving notes?"
+    }
+  ]
+}

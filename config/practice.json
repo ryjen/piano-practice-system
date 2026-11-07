@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "timezone": "America/Vancouver",
+  "preferred_days": [
+    "TU",
+    "TH"
+  ],
+  "preferred_local_time": "19:00",
+  "duration_minutes": 20,
+  "technique_order": [
+    "pulse",
+    "navigation",
+    "dynamics"
+  ]
+}

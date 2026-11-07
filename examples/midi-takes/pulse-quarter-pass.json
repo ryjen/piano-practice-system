@@ -1,0 +1,63 @@
+{
+  "contract_version": "midi-take/v1",
+  "exercise_id": "pulse-quarter",
+  "source": "synthetic-test-fixture",
+  "events": [
+    {
+      "t_ms": 0,
+      "type": "note_on",
+      "channel": 0,
+      "note": 60,
+      "velocity": 70
+    },
+    {
+      "t_ms": 400,
+      "type": "note_off",
+      "channel": 0,
+      "note": 60,
+      "velocity": 0
+    },
+    {
+      "t_ms": 1000,
+      "type": "note_on",
+      "channel": 0,
+      "note": 60,
+      "velocity": 70
+    },
+    {
+      "t_ms": 1400,
+      "type": "note_off",
+      "channel": 0,
+      "note": 60,
+      "velocity": 0
+    },
+    {
+      "t_ms": 2000,
+      "type": "note_on",
+      "channel": 0,
+      "note": 60,
+      "velocity": 70
+    },
+    {
+      "t_ms": 2400,
+      "type": "note_off",
+      "channel": 0,
+      "note": 60,
+      "velocity": 0
+    },
+    {
+      "t_ms": 3000,
+      "type": "note_on",
+      "channel": 0,
+      "note": 60,
+      "velocity": 70
+    },
+    {
+      "t_ms": 3400,
+      "type": "note_off",
+      "channel": 0,
+      "note": 60,
+      "velocity": 0
+    }
+  ]
+}
