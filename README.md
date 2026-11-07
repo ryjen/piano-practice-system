@@ -170,7 +170,7 @@ This apply operation rejects stale revisions, modified state/catalog content, an
 
 ## Explicit competency and maintenance progression
 
-New `feedback/v2` records include practice context (`isolation` or `musical-context`), a human-authored observation, and optional recital-reference ID. For a real session, add these parameters to `feedback propose`:
+New `feedback/v2` records include an explicit IANA timezone (`America/Vancouver` by default), practice context (`isolation` or `musical-context`), human-authored observation, and optional recital or Alfred method-book checkpoint references. For a real session, add these parameters to `feedback propose`:
 
 ```sh
 pianoctl feedback propose \
@@ -179,6 +179,9 @@ pianoctl feedback propose \
   --exercise reading-staff-steps --feedback appropriate \
   --comfort comfortable --passed yes --bpm 60 \
   --context isolation --observation "Read each staff note correctly" \
+  --timezone America/Vancouver \
+  --method-book-id alfred-basic-adult-1 \
+  --method-checkpoint "Level One section 3" \
   > local/reading-feedback.json
 ```
 
@@ -197,7 +200,7 @@ pianoctl progression apply local/reading-gate.json \
 pianoctl progression due --date 2026-11-25 --state local/learner-state.json
 ```
 
-The gate rules require separate approved, comfortable session dates with correct context, treat absent evidence as unknown, and reset promotion evidence after adverse feedback. Maintained techniques become due again according to the configured interval (default 14 days), or earlier when recovery is needed. **Human approval is required for both feedback and progression**; a content digest is not a signature. See [progression contracts and gates](docs/progression.md).
+The gate rules require separate approved, comfortable session dates with correct context, treat absent evidence as unknown, and reset promotion evidence after adverse feedback. An adverse report approved after a same-day transition is retained for recovery using append revisions, while same-day positive sessions do not substitute for independent post-transition practice dates. Maintained techniques become due again according to the configured interval (default 14 days), or earlier when recovery is needed. **Human approval is required for both feedback and progression**; a content digest is not a signature. See [progression contracts and gates](docs/progression.md).
 
 ## Source, evidence, and privacy
 

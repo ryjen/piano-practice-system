@@ -23,7 +23,7 @@ REQUIRED = {
 }
 _EVENT_KEYS = {"id", "technique_id", "from_state", "to_state",
                "effective_date", "evidence_ids", "ruleset_version",
-               "approval_key", "approved"}
+               "approval_key", "approved", "applied_revision"}
 
 
 def _iso(raw: str) -> date:
@@ -46,6 +46,7 @@ def validate_events(state: dict, catalog: dict) -> None:
     ids = set()
     by_technique = {}
     latest_event_date = {}
+    latest_event_revision = {}
     approved_feedback = {}
     for session in state["sessions"]:
         if not session.get("approved") or not isinstance(session.get("id"), str):
@@ -78,8 +79,13 @@ def validate_events(state: dict, catalog: dict) -> None:
             raise ValueError("illegal progression transition")
         current_date = _iso(event["effective_date"])
         previous_date = latest_event_date.get(technique)
+        previous_revision = latest_event_revision.get(technique)
         if previous_date is not None and current_date < previous_date:
             raise ValueError("non-monotonic progression dates")
+        revision = event["applied_revision"]
+        if (type(revision) is not int or revision <= 0 or revision > state["revision"]
+                or (previous_revision is not None and revision <= previous_revision)):
+            raise ValueError("invalid progression approval order")
         refs = event["evidence_ids"]
         if not isinstance(refs, list) or not refs or len(refs) != len(set(refs)):
             raise ValueError("invalid supporting evidence IDs")
@@ -95,8 +101,17 @@ def validate_events(state: dict, catalog: dict) -> None:
             if session.get("context") not in ("isolation", "musical-context"):
                 raise ValueError("legacy/unscoped feedback cannot prove competency")
             observed_on = _iso(session["date"])
-            if observed_on > current_date or (previous_date is not None and observed_on <= previous_date):
+            session_revision = session.get("applied_revision")
+            if (type(session_revision) is not int or not 0 < session_revision < revision
+                    or observed_on > current_date):
                 raise ValueError("progression evidence outside the approved transition window")
+            if previous_date is not None:
+                if observed_on < previous_date:
+                    raise ValueError("progression evidence precedes previous transition")
+                if observed_on == previous_date and (
+                    forward or previous_revision is None or session_revision <= previous_revision
+                ):
+                    raise ValueError("same-day evidence must be adverse and approved after prior transition")
             referenced.append(session)
         if forward:
             scope, needed = REQUIRED[nxt]
@@ -110,6 +125,7 @@ def validate_events(state: dict, catalog: dict) -> None:
             raise ValueError("regression requires explicit adverse evidence")
         by_technique[technique] = nxt
         latest_event_date[technique] = current_date
+        latest_event_revision[technique] = revision
 
 
 def current_state(state: dict, technique_id: str) -> tuple[str, str | None]:
@@ -121,7 +137,8 @@ def current_state(state: dict, technique_id: str) -> tuple[str, str | None]:
 
 
 def _eligible_feedback(state: dict, catalog: dict, technique_id: str,
-                       as_of: date, after: date | None) -> list[dict]:
+                       as_of: date, after: date | None,
+                       after_revision: int | None = None) -> list[dict]:
     by_id = {ex["id"]: ex["technique_id"] for ex in catalog["exercises"]}
     # Only feedback/v2 entries with explicit context and unique stable IDs
     # can establish a competency gate. Legacy feedback/v1 stays unknown.
@@ -131,8 +148,21 @@ def _eligible_feedback(state: dict, catalog: dict, technique_id: str,
         if not entry["approved"] or by_id[entry["exercise_id"]] != technique_id:
             continue
         d = _iso(entry["date"])
-        if d > as_of or (after is not None and d <= after):
+        if d > as_of:
             continue
+        if after is not None:
+            if d < after:
+                continue
+            if d == after:
+                # Without times of day, only explicitly adverse feedback
+                # approved AFTER the transition can trigger same-day recovery.
+                is_adverse = (entry["passed"] is False or
+                              entry["comfort"] == "tension" or
+                              entry["feedback"] == "hard")
+                revision = entry.get("applied_revision")
+                if (not is_adverse or after_revision is None or
+                        type(revision) is not int or revision <= after_revision):
+                    continue
         entry_id = entry.get("id")
         if not isinstance(entry_id, str) or not entry_id or entry_id in seen:
             continue
@@ -161,7 +191,14 @@ def evaluate(catalog: dict, state: dict, technique_id: str, target_state: str,
     after = _iso(last_transition) if last_transition else None
     if after is not None and day < after:
         raise ValueError("assessment date precedes approved progression state")
-    records = _eligible_feedback(state, catalog, technique_id, day, after)
+    previous_event = next(
+        (e for e in reversed(state.get("progression_events", []))
+         if e["technique_id"] == technique_id), None
+    )
+    records = _eligible_feedback(
+        state, catalog, technique_id, day, after,
+        previous_event["applied_revision"] if previous_event else None
+    )
     positive = [e for e in records if
                 e["passed"] is True and e["comfort"] == "comfortable"]
     adverse = [e for e in records if
@@ -242,6 +279,7 @@ def apply(path: str, catalog: dict, proposal: dict, acknowledgement: str) -> dic
                 "evidence_ids": proposal["evidence_ids"],
                 "ruleset_version": RULESET,
                 "approval_key": key, "approved": True,
+                "applied_revision": proposal["state_revision"] + 1,
             }
             if len(matches) == 1 and existing == expected:
                 return None, {"result": "already-applied", "state_revision": state["revision"], "event_id": event_id}
@@ -261,7 +299,8 @@ def apply(path: str, catalog: dict, proposal: dict, acknowledgement: str) -> dic
             "from_state": proposal["from_state"], "to_state": proposal["to_state"],
             "effective_date": proposal["effective_date"],
             "evidence_ids": proposal["evidence_ids"],
-            "ruleset_version": RULESET, "approval_key": key, "approved": True
+            "ruleset_version": RULESET, "approval_key": key, "approved": True,
+            "applied_revision": state["revision"] + 1,
         }
         next_state = {**state, "revision": state["revision"] + 1,
                       "progression_events": [*state.get("progression_events", []), event]}
@@ -286,7 +325,14 @@ def maintenance_due(catalog: dict, state: dict, as_of: str, interval_days: int) 
             continue
         # Verified post-promotion context checks may refresh last verification.
         reference = _iso(approved_on)
-        records = _eligible_feedback(state, catalog, technique, day, reference)
+        previous_event = next(
+            (e for e in reversed(state.get("progression_events", []))
+             if e["technique_id"] == technique), None
+        )
+        records = _eligible_feedback(
+            state, catalog, technique, day, reference,
+            previous_event["applied_revision"] if previous_event else None
+        )
         verified = [e for e in records
                     if e["context"] == "musical-context"
                     and e["passed"] is True and e["comfort"] == "comfortable"]

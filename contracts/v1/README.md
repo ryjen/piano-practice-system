@@ -14,7 +14,7 @@ Contracts are local-first and machine-readable JSON. Preserve compatibility by a
 | `midi-take/v1` | `pianoctl capture` | Timestamped MIDI note-on/off and sustain CC64, MIDI channel, pitch and velocity; no audio or finger identity |
 | `assessment/v1` | `pianoctl assess` | Relative onset/pitch/release/dynamics evidence, not mastery; manual-requirement returns `unknown` for physical/reading techniques |
 | `feedback/v1` | `pianoctl feedback propose` (without context) | Historical reviewed self-report record; valid for schedule history, **ineligible** for context-specific competency gates |
-| `feedback/v2` | `pianoctl feedback propose --context ...` | Explicit `isolation` or `musical-context`, human `observation`, optional `repertoire_id`, source-state and catalog digests, content acknowledgement |
+| `feedback/v2` | `pianoctl feedback propose --context ...` | Explicit `isolation` or `musical-context`, named IANA `timezone`, human `observation`, optional `repertoire_id`, `method_book_id` and private `method_checkpoint`, source-state and catalog digests, content acknowledgement |
 | `progression/v1` | `pianoctl progression evaluate/apply` | Bounded multi-session gate proposal and distinct explicit approval; one-step regression and maintained-state maintenance queue |
 | `midi-trace-inspection/v1` | `pianoctl hardware <take>` | Structural diagnostic from provided MIDI bytes; **never physical device attestation** |
 | Original MusicXML | `pianoctl notation --exercise ...` | Original single-staff exercise generated from public note sequences; no imported Alfred notation |
@@ -24,6 +24,8 @@ Contracts are local-first and machine-readable JSON. Preserve compatibility by a
 The state moves only through explicit, reviewed `feedback apply` or `progression apply` operations, never through `plan`, MIDI scores, or calendar metadata. Each accepted event increments a state revision; exact repeated proposals are idempotent, and stale/conflicting event IDs or altered source contents are rejected. Separate writers must honor the same POSIX sidecar lock. SHA-256 acknowledgement keys bind reviewed *content*, **not user authentication/signature or multi-user authorization**.
 
 `feedback/v2` is required to establish isolation/musical-context competency gates. The player supplies difficulty/comfort and whether the task was accomplished; a MIDI result cannot supply fingering, staff comprehension, hand identity, physical comfort or acoustic performance. Missing evidence remains `unknown` or `blocked`, not guessed.
+
+Each approved feedback/v2 and progression event carries its `applied_revision` so an adverse report added after a transition on the same calendar date is still available for recovery checks. Same-day positive evidence does not count as a new independent practice date. Exact-event replays must match the original append revision.
 
 Technique states: `discovered → developing → reliable-isolation → reliable-context → maintained`. Reviewable lifecycle states `paused` and `retired` are vocabulary only, not part of the v1 transition writer. A one-step regression needs explicit adverse evidence. Positive gate requirements are based on distinct approved practice dates after the previous transition and latest adverse feedback.
 

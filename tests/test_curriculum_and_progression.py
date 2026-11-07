@@ -108,14 +108,17 @@ class ProgressionTests(unittest.TestCase):
         return json.loads(self.state_path.read_text(encoding="utf-8"))
 
     def session(self, n, date, *, context="isolation", comfort="comfortable",
-                passed=True, feedback="appropriate", repertoire_id=None):
+                passed=True, feedback="appropriate", repertoire_id=None,
+                exercise_id="reading-staff-steps", method_book_id=None,
+                method_checkpoint=None):
         state = self.state()
         p = propose_feedback(
             self.catalog, state,
-            event_id=f"session-{n}", on_date=date, exercise_id="reading-staff-steps",
+            event_id=f"session-{n}", on_date=date, exercise_id=exercise_id,
             feedback=feedback, comfort=comfort, passed=passed, realized_bpm=60,
             evidence_refs=[], context=context, observation="My own reading check",
-            repertoire_id=repertoire_id
+            repertoire_id=repertoire_id,
+            method_book_id=method_book_id, method_checkpoint=method_checkpoint
         )
         outcome = apply_feedback(self.state_path, self.catalog, p, p["approval_key"])
         self.assertEqual(outcome["result"], "applied")
@@ -229,6 +232,69 @@ class ProgressionTests(unittest.TestCase):
         self.assertEqual(self.transition("reliable-isolation", "2026-11-07", apply=False)["gate"], "blocked")
         self.session(5, "2026-11-08")
         self.assertEqual(self.transition("reliable-isolation", "2026-11-09", apply=False)["gate"], "pass")
+
+    def test_same_day_post_approval_adverse_requires_recovery(self):
+        # All musical practice dates and transition approvals are explicit.
+        self.session(1, "2026-11-01")
+        self.transition("developing", "2026-11-02")
+        self.session(2, "2026-11-03")
+        self.session(3, "2026-11-04")
+        self.transition("reliable-isolation", "2026-11-05")
+        self.session(4, "2026-11-06", context="musical-context")
+        self.session(5, "2026-11-07", context="musical-context")
+        self.transition("reliable-context", "2026-11-08")
+        self.session(6, "2026-11-09", context="musical-context")
+        self.session(7, "2026-11-10", context="musical-context")
+        self.transition("maintained", "2026-11-11")
+        before = self.state()
+        approval_revision = before["progression_events"][-1]["applied_revision"]
+
+        # An advanced-exercise failure is approved later on the SAME date.
+        self.session(8, "2026-11-11", exercise_id="reading-accidentals",
+                     context="musical-context", passed=False, feedback="hard",
+                     comfort="tension")
+        after = self.state()
+        self.assertGreater(after["sessions"][-1]["applied_revision"], approval_revision)
+        due = maintenance_due(self.catalog, after, "2026-11-13", 14)
+        self.assertEqual(due[0]["reason"], "adverse-feedback")
+        plan = propose(self.catalog, after, self.config, "2026-11-13")
+        self.assertEqual(plan["exercise_id"], "reading-staff-steps")
+        self.assertIn("recovery", plan["rationale"])
+        self.assertEqual(
+            self.transition("reliable-context", "2026-11-13", apply=False)["gate"],
+            "pass"
+        )
+        self.transition("reliable-context", "2026-11-13")
+        self.assertEqual(current_state(self.state(), "reading")[0], "reliable-context")
+
+    def test_method_checkpoint_timezone_and_event_revision(self):
+        p = self.session(1, "2026-11-01", method_book_id="alfred-basic-adult-1",
+                         method_checkpoint="Level One section 3 (private reference)")
+        row = self.state()["sessions"][0]
+        self.assertEqual(p["contract_version"], "feedback/v2")
+        self.assertEqual(row["timezone"], "America/Vancouver")
+        self.assertEqual(row["method_book_id"], "alfred-basic-adult-1")
+        self.assertEqual(row["method_checkpoint"],
+                         "Level One section 3 (private reference)")
+        self.assertEqual(row["applied_revision"], 1)
+        self.assertEqual(apply_feedback(self.state_path, self.catalog,
+                                        p, p["approval_key"])["result"], "already-applied")
+        changed = self.state()
+        changed["sessions"][0]["applied_revision"] = 2
+        self.state_path.write_text(json.dumps(changed), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "conflicting feedback"):
+            apply_feedback(self.state_path, self.catalog, p, p["approval_key"])
+
+    def test_bad_timezone_or_checkpoint_without_book_rejected(self):
+        state = self.state()
+        common = dict(event_id="invalid", on_date="2026-11-01",
+                      exercise_id="reading-staff-steps", feedback="appropriate",
+                      comfort="comfortable", passed=True, realized_bpm=60,
+                      context="isolation")
+        with self.assertRaisesRegex(ValueError, "invalid IANA timezone"):
+            propose_feedback(self.catalog, state, timezone="Nowhere/NoZone", **common)
+        with self.assertRaisesRegex(ValueError, "checkpoint requires a method book"):
+            propose_feedback(self.catalog, state, method_checkpoint="p.1", **common)
 
     def test_negative_gate_cannot_be_applied(self):
         p = self.transition("developing", "2026-11-02", apply=False)

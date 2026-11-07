@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath
 import re
 import tempfile
 from datetime import date
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 try:
     import fcntl
@@ -36,7 +37,8 @@ def _identifier(value: object, label: str) -> None:
 
 def _event(event: dict, catalog: dict) -> None:
     base = set(SESSION_FIELDS)
-    extended = base | {"context", "observation", "repertoire_id"}
+    extended = base | {"context", "observation", "repertoire_id",
+                       "timezone", "method_book_id", "method_checkpoint"}
     if not isinstance(event, dict) or set(event) not in (base, extended):
         raise ValueError("invalid feedback event fields")
     if set(event) == extended:
@@ -46,6 +48,18 @@ def _event(event: dict, catalog: dict) -> None:
             raise ValueError("invalid practice observation")
         if event["repertoire_id"] is not None:
             _identifier(event["repertoire_id"], "repertoire id")
+        if not isinstance(event["timezone"], str) or "/" not in event["timezone"]:
+            raise ValueError("feedback/v2 needs a named IANA timezone")
+        try:
+            ZoneInfo(event["timezone"])
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            raise ValueError("invalid IANA timezone") from exc
+        if event["method_book_id"] is not None:
+            _identifier(event["method_book_id"], "method book id")
+        checkpoint = event["method_checkpoint"]
+        if checkpoint is not None:
+            if event["method_book_id"] is None or not isinstance(checkpoint, str) or not 1 <= len(checkpoint) <= 120:
+                raise ValueError("checkpoint requires a method book id and short private reference")
     _identifier(event["id"], "feedback id")
     try:
         parsed = date.fromisoformat(event["date"])
@@ -78,19 +92,24 @@ def proposal(catalog: dict, state: dict, *, event_id: str, on_date: str,
              exercise_id: str, feedback: str, comfort: str,
              passed: bool | None, realized_bpm: int, evidence_refs: list[str] | None = None,
              context: str | None = None, observation: str = "",
-             repertoire_id: str | None = None) -> dict:
+             repertoire_id: str | None = None, timezone: str = "America/Vancouver",
+             method_book_id: str | None = None,
+             method_checkpoint: str | None = None) -> dict:
     validate_catalog(catalog)
     validate_state(state, catalog)
     event = dict(id=event_id, date=on_date, exercise_id=exercise_id,
                  feedback=feedback, comfort=comfort, passed=passed,
                  realized_bpm=realized_bpm, evidence_refs=list(evidence_refs or []))
-    if context is None and (observation or repertoire_id is not None):
-        raise ValueError("feedback/v2 context is required for observations or repertoire")
+    if context is None and (observation or repertoire_id is not None
+                            or method_book_id is not None or method_checkpoint is not None):
+        raise ValueError("feedback/v2 context is required for observations or materials")
     version = "feedback/v1"
     if context is not None:
         version = "feedback/v2"
         event.update(context=context, observation=observation,
-                     repertoire_id=repertoire_id)
+                     repertoire_id=repertoire_id, timezone=timezone,
+                     method_book_id=method_book_id,
+                     method_checkpoint=method_checkpoint)
     _event(event, catalog)
     bare = dict(
         record_type="feedback-proposal", contract_version=version,
@@ -112,7 +131,10 @@ def _validate_proposal(proposed: dict, catalog: dict) -> str:
         raise ValueError("unsupported proposal version")
     expected_fields = set(SESSION_FIELDS)
     if proposed["contract_version"] == "feedback/v2":
-        expected_fields.update(("context", "observation", "repertoire_id"))
+        expected_fields.update((
+            "context", "observation", "repertoire_id", "timezone",
+            "method_book_id", "method_checkpoint"
+        ))
     if set(proposed["event"]) != expected_fields:
         raise ValueError("proposal event does not match version")
     if type(proposed["state_revision"]) is not int or proposed["state_revision"] < 0:
@@ -156,6 +178,8 @@ def apply(path: Path | str, catalog: dict, proposed: dict, acknowledged_key: str
         prior = [x for x in state["sessions"] if x.get("id") == event["id"]]
         if prior:
             exact_entry = {**event, "approved": True, "approval_key": expected}
+            if proposed["contract_version"] == "feedback/v2":
+                exact_entry["applied_revision"] = proposed["state_revision"] + 1
             # A stored hash/ID is not sufficient: compare the complete approved
             # event to reject edits that preserve the original approval key.
             if len(prior) == 1 and prior[0] == exact_entry:
@@ -170,11 +194,10 @@ def apply(path: Path | str, catalog: dict, proposed: dict, acknowledged_key: str
         # Existing records without IDs remain readable for compatibility.
         updated = dict(state)
         updated["revision"] = state["revision"] + 1
-        updated["sessions"] = [*state["sessions"], {
-            **event,
-            "approved": True,
-            "approval_key": expected,
-        }]
+        approved_entry = {**event, "approved": True, "approval_key": expected}
+        if proposed["contract_version"] == "feedback/v2":
+            approved_entry["applied_revision"] = updated["revision"]
+        updated["sessions"] = [*state["sessions"], approved_entry]
         validate_state(updated, catalog)
         # A partial/corrupt write must not replace canonical state.
         temp_path = None

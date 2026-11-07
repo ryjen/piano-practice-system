@@ -59,6 +59,9 @@ def main(argv=None) -> int:
                        help="explicit human practice context (required for competency evidence)")
     draft.add_argument("--observation", default="", help="human-observed difficulty or correction")
     draft.add_argument("--repertoire-id", help="optional repertoire slug; metadata only")
+    draft.add_argument("--timezone", default="America/Vancouver", help="IANA local practice timezone")
+    draft.add_argument("--method-book-id", help="optional method-book slug")
+    draft.add_argument("--method-checkpoint", help="private short page/section reference")
     approve = feedback_cmds.add_parser("apply", help="explicit, revision-safe approval of reviewed proposal")
     approve.add_argument("proposal", help="previously reviewed feedback proposal JSON")
     approve.add_argument("--state", required=True, help="existing private learner state JSON")
@@ -109,7 +112,9 @@ def main(argv=None) -> int:
                     feedback=args.feedback, comfort=args.comfort, passed=passed,
                     realized_bpm=args.bpm, evidence_refs=args.evidence_ref,
                     context=args.context, observation=args.observation,
-                    repertoire_id=args.repertoire_id
+                    repertoire_id=args.repertoire_id, timezone=args.timezone,
+                    method_book_id=args.method_book_id,
+                    method_checkpoint=args.method_checkpoint
                 ))
             elif args.feedback_command == "apply":
                 _print(apply_feedback(

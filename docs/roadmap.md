@@ -8,7 +8,7 @@
 - Explicit Tuesday/Thursday planning preference, injected-date deterministic technique rotation, 15/20/30-minute plans, five-block flow and five-minute fallback
 - Original single-staff MusicXML reading/minor exercises; no copyrighted book content or arbitrary external song transcription
 - Optional MIDI capture using mido/python-rtmidi, offline pitch/timing/release/relative-velocity assessment, human-required gate for reading and physical techniques
-- Versioned `feedback/v1` compatibility and `feedback/v2` explicit isolation/musical-context observations with optional recital reference
+- Versioned `feedback/v1` compatibility and `feedback/v2` explicit isolation/musical-context observations, named timezone, private Alfred checkpoint and optional recital reference; append revision preserves same-day recovery evidence
 - Explicit feedback approval and deterministic competency progression with state/content digests, stale-state and conflicting-event rejection, one-step review-only regression, replay idempotence, cooperative POSIX lock and atomic state replacement
 - Distinct-day gate evidence, adverse-feedback reset, maintained-state scheduling with explicit due/recovery reasons
 - MIDI trace inspection with synthetic positive/negative tests that **never** assert physical hardware qualification

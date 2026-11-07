@@ -6,7 +6,7 @@ Practice scope includes staff reading, hands-together coordination, the circle o
 
 - **Alfred's Basic Adult Piano Course — Level One**: reference only; the user's physical or licensed score is authoritative for pages, pacing, notation, and drills.
 - **Level Two**: subsequent practice context; do not automatically assume Level One is completed.
-- Capture optional book/exercise/page *identifiers* in private practice notes. Never reproduce protected exercises, scores, or scans in the public catalog.
+- Capture optional book/exercise/page *identifiers* in private practice notes. Feedback/v2 supports `--method-book-id` and `--method-checkpoint`, bound to the approved practice date/timezone and local revision. Never reproduce protected exercises, scores, or scans in the public catalog.
 
 ## Recital candidates
 

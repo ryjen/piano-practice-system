@@ -111,9 +111,14 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         or latest_foundation["passed"] is False
     )
     maintenance_recovery = bool(due and due[0].get("reason") == "adverse-feedback")
-    exercise = advanced[0] if (
-        (len(successful_dates) >= 2 and not regression_signal) or (due and not maintenance_recovery)
-    ) else foundation
+    # Recovery always outranks ordinary advancement, even when historical
+    # foundation successes would otherwise select the advanced exercise.
+    if maintenance_recovery:
+        exercise = foundation
+    elif (len(successful_dates) >= 2 and not regression_signal) or due:
+        exercise = advanced[0]
+    else:
+        exercise = foundation
     recent = sorted(
         (s for s in active if s["exercise_id"] == exercise["id"]),
         key=lambda s: s["date"]

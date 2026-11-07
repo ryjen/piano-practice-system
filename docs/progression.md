@@ -4,7 +4,7 @@ The public piano core borrows the guitar-practice-system boundary: **evidence â†
 
 ## Feedback/v2
 
-Use `pianoctl feedback propose` with `--context isolation` or `--context musical-context` and `--observation`. Both the pass/fail/unknown self-check and physical comfort must be reported by the player; no MIDI score can claim these observations.
+Use `pianoctl feedback propose` with `--context isolation` or `--context musical-context`, `--timezone America/Vancouver`, and `--observation`. Optional `--method-book-id alfred-basic-adult-1` / `--method-checkpoint "Level One section 3"` record the user's private method-book milestone without copying any copyrighted notation. Both the pass/fail/unknown self-check and physical comfort must be reported by the player; no MIDI score can claim these observations.
 
 Example (from a genuine practice session, with private state initialized):
 
@@ -36,7 +36,7 @@ Legacy `feedback/v1` events without explicit context remain valid history for sc
 | reliable-context â†’ maintained | 2 additional separate approved, comfortable, passed musical-context dates |
 | one-step regression | At least one explicit adverse feedback/v2 event since preceding transition, separately approved |
 
-An adverse observation (`passed=false`, `comfort=tension`, or `feedback=hard`) **resets forward repeatability gates**. Earlier successes cannot be reused to promote immediately after a failure. Missing/unknown fields remain unknown, and one best take cannot prove maintenance. The gate is based on reviewed player observations, not on an independent exam or posture analysis.
+An adverse observation (`passed=false`, `comfort=tension`, or `feedback=hard`) **resets forward repeatability gates**. A same-date adverse report that was **approved after** an existing transition is included in recovery/maintenance checks by comparing stored `applied_revision` values. Same-day successes are deliberately excluded from the next stage's distinct-date promotion evidence. Earlier successes cannot be reused to promote immediately after a failure. Missing/unknown fields remain unknown, and one best take cannot prove maintenance. The gate is based on reviewed player observations, not on an independent exam or posture analysis.
 
 ```sh
 pianoctl progression evaluate \
