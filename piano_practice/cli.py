@@ -33,6 +33,7 @@ def main(argv=None) -> int:
     plan.add_argument("--state", default="examples/learner-state.json")
     plan.add_argument("--catalog", default="catalogs/exercises.json")
     plan.add_argument("--config", default="config/practice.json")
+    plan.add_argument("--focus", help="explicit primary technique override; read-only and advisory")
     check = sub.add_parser("assess", help="evaluate a captured MIDI take")
     check.add_argument("take")
     check.add_argument("--catalog", default="catalogs/exercises.json")
@@ -104,7 +105,8 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "plan":
-            _print(propose(_load(args.catalog), _load(args.state), _load(args.config), args.date))
+            _print(propose(_load(args.catalog), _load(args.state), _load(args.config),
+                           args.date, focus_override=args.focus))
         elif args.command == "assess":
             _print(assess(_load(args.take), _load(args.catalog)))
         elif args.command == "ports":

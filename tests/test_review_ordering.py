@@ -69,6 +69,37 @@ class MaintenancePriorityTests(unittest.TestCase):
         self.assertEqual(next_session["technique_id"], "pulse")
         self.assertEqual(next_session["exercise_id"], "pulse-quarter")
         self.assertIn("recovery", next_session["rationale"])
+        override = propose(
+            self.catalog, self.state(), self.config,
+            "2026-11-12", focus_override="arpeggios"
+        )
+        self.assertEqual(override["technique_id"], "arpeggios")
+        self.assertEqual(override["selection"]["priority"], "manual-override")
+        self.assertIn("defers adverse-feedback for pulse", override["warnings"][0])
+        self.assertEqual(override["exercise_id"], "arpeggio-major-one-octave")
+
+    def test_manual_override_of_second_urgent_technique_preserves_recovery(self):
+        self.establish_maintained("reading", 10)
+        self.establish_maintained("pulse", 11)
+        self.record("reading", "2026-11-12", context="musical-context", passed=False)
+        self.record("pulse", "2026-11-12", context="musical-context", passed=False)
+        # Two subsequent *isolation* successes may justify trying advanced
+        # lessons, but cannot resolve an outstanding musical-context failure.
+        self.record("pulse", "2026-11-13", context="isolation")
+        self.record("pulse", "2026-11-14", context="isolation")
+        due = maintenance_due(self.catalog, self.state(), "2026-11-15", 14)
+        self.assertEqual([entry["technique_id"] for entry in due[:2]],
+                         ["reading", "pulse"])
+        self.assertTrue(all(entry["reason"] == "adverse-feedback" for entry in due[:2]))
+        selected = propose(self.catalog, self.state(), self.config,
+                           "2026-11-15", focus_override="pulse")
+        self.assertEqual(selected["technique_id"], "pulse")
+        self.assertEqual(selected["exercise_id"], "pulse-quarter")
+        self.assertEqual(selected["selection"]["priority"], "manual-override")
+        self.assertIn("defers adverse-feedback for reading", selected["warnings"][0])
+        self.assertIn("recovery", selected["rationale"])
+        self.assertEqual(selected["selection"]["selected_obligation"]["technique_id"],
+                         "pulse")
 
 
 if __name__ == "__main__":

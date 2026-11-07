@@ -26,6 +26,8 @@ Practice is useful without a MIDI keyboard, DAW, song library, AI provider, clou
 
 The preferred Tuesday/Thursday evening cadence is recorded in [config/practice.json](config/practice.json) (`America/Vancouver`, 19:00, 20 minutes). **It does not create notifications or calendar events.** Invoke the planner for a specific date.
 
+The optional **goal-weighted scheduler** prioritizes reading and hands-together coordination, with additional emphasis on arpeggios and scale-pattern work. It uses explicit integer weights and time since each approved session, never guesses proficiency. The short reading/coordination warm-ups are **inside the existing preparation minutes**, not extra practice time. Remove `goal_weights` to restore legacy least-recently-practiced ordering. See [scheduling policy](docs/scheduling.md).
+
 ## Mental model
 
 The system shares the guitar repository's division of responsibilities:
@@ -145,7 +147,14 @@ chmod 600 local/learner-state.json
 
 python3 -m piano_practice.cli plan \
   --date 2026-11-10 --state local/learner-state.json
+
+# Explicit primary-technique override (read-only, with recovery warning):
+python3 -m piano_practice.cli plan \
+  --date 2026-11-12 --state local/learner-state.json \
+  --focus arpeggios
 ```
+
+Each proposal contains an inspectable `selection` (policy, candidate scores, choice), `warmups_within_prepare`, and `previous_context_references` drawn solely from reviewed sessions. An Alfred page/section reference or recital ID is **previously referenced, completion unknown**—never silently marked complete. A manual `--focus` overrides the recommended primary technique but warns if an adverse recovery item is being deferred.
 
 The suggested five blocks are **prepare → baseline → isolate → musical context → verify**. Follow the session instructions and self-check before deciding whether you completed the exercise. `plan` reads state but never changes it.
 
