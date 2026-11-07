@@ -61,6 +61,25 @@ class FeedbackLedgerTests(unittest.TestCase):
             apply(self.path, self.catalog, p2, p2["approval_key"])
         self.assertEqual(load_state(self.path)["revision"], 1)
 
+    def test_idempotent_retry_rejects_tampered_approved_event(self):
+        p = self.propose()
+        apply(self.path, self.catalog, p, p["approval_key"])
+        state = load_state(self.path)
+        state["sessions"][0]["passed"] = False
+        self.path.write_text(json.dumps(state), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "conflicting feedback event id"):
+            apply(self.path, self.catalog, p, p["approval_key"])
+        self.assertEqual(load_state(self.path)["sessions"][0]["passed"], False)
+
+    def test_idempotent_retry_rejects_tampered_event_with_extra_field(self):
+        p = self.propose()
+        apply(self.path, self.catalog, p, p["approval_key"])
+        state = load_state(self.path)
+        state["sessions"][0]["unexpected"] = True
+        self.path.write_text(json.dumps(state), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "conflicting feedback event id"):
+            apply(self.path, self.catalog, p, p["approval_key"])
+
     def test_same_id_conflicting_content_fails(self):
         p = self.propose()
         apply(self.path, self.catalog, p, p["approval_key"])

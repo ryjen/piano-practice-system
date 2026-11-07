@@ -132,7 +132,10 @@ def apply(path: Path | str, catalog: dict, proposed: dict, acknowledged_key: str
         event = proposed["event"]
         prior = [x for x in state["sessions"] if x.get("id") == event["id"]]
         if prior:
-            if len(prior) == 1 and prior[0].get("approval_key") == expected and prior[0]["approved"]:
+            exact_entry = {**event, "approved": True, "approval_key": expected}
+            # A stored hash/ID is not sufficient: compare the complete approved
+            # event to reject edits that preserve the original approval key.
+            if len(prior) == 1 and prior[0] == exact_entry:
                 return {"result": "already-applied", "state_revision": state["revision"],
                         "event_id": event["id"]}
             raise ValueError("conflicting feedback event id")

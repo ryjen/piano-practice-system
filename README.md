@@ -1,90 +1,153 @@
 # Piano Practice System
 
-**Status:** public reference core — initial deterministic implementation
+**Status:** deterministic, local-first reference implementation. Software CI is passing; physical **M-Audio Oxygen Pro 61** qualification is outstanding.
 
-A technique-centred, local-first piano practice system modeled on the architecture of [ryjen/guitar-practice-system](https://github.com/ryjen/guitar-practice-system). Techniques own progression; musical context makes practice meaningful; evidence and human feedback guide the next session. Neither a particular song nor a hosted AI service is required.
+A technique-first piano practice system modeled on [ryjen/guitar-practice-system](https://github.com/ryjen/guitar-practice-system). It answers: **What single technique should I work on next, how should I practice it, and what evidence would justify changing the plan?**
 
-The initial target instrument is an **M-Audio Oxygen Pro 61**. It is a USB MIDI controller, not an acoustic piano or standalone sound generator; connect it to a software instrument if audible piano sound is needed. Hardware is optional: the lesson plans work without MIDI.
+Practice is useful without a MIDI keyboard, DAW, song library, AI provider, cloud service, or account. MIDI is optional supporting evidence, not an authoritative teacher.
 
-## Practice model
+## Current capabilities
+
+| Capability | Status |
+| --- | --- |
+| Reproducible session proposals, one technique and one self-check | Implemented |
+| Pulse, keyboard navigation, and dynamics (two levels each) | Implemented |
+| Conservative rotation from approved history and explicit feedback | Implemented |
+| 15-, 20-, or 30-minute sessions, with a 5-minute fallback | Implemented |
+| USB MIDI port listing and bounded note/CC64 capture | Implemented, **hardware not qualified** |
+| Pitch, relative onset timing, release-pairing, and relative velocity checks | Implemented, advisory |
+| Human-reviewed, revision-safe feedback application | Implemented, explicit approval required |
+| Automatic mastery promotion, synchronized metronome, synthesis, UI, calendar notifications | Not implemented |
+
+The preferred Tuesday/Thursday evening cadence is recorded in [config/practice.json](config/practice.json) (`America/Vancouver`, 19:00, 20 minutes). **It does not create notifications or calendar events.** Invoke the planner for a specific date.
+
+## Mental model
+
+The system shares the guitar repository's division of responsibilities:
+
+1. **Techniques** own learning progression, prerequisites, exercises, and gates.
+2. **Sessions** realize one technique at an explicit tempo and time budget; optional repertoire and accompaniment provide musical context.
+3. **Instrument adapters** observe the keyboard; they do not assert fingering, hand identity, posture, or musical intent.
+4. **Evidence** combines advisory MIDI checks with explicit human observations.
+5. **Assessment and planning** propose next actions, but state changes require deliberate approval.
 
 ```mermaid
 flowchart LR
-    T[Technique catalog] --> P[Deterministic proposal]
-    S[Explicit, approved history] --> P
-    P --> U[Player performs]
-    U --> O[MIDI observations + human feedback]
-    O --> A[Advisory gate results]
-    A --> R[Human approval / state update]
-    R --> S
+    Catalog[Technique catalog] --> Plan[Deterministic session proposal]
+    State[Approved practice history] --> Plan
+    Plan --> Play[Practice on piano or MIDI keyboard]
+    Play --> Observe[Optional MIDI take + self-report]
+    Observe --> Assess[Advisory assessment]
+    Assess --> Review[Review feedback proposal]
+    Review --> Approve{Explicit approval?}
+    Approve -->|Yes| State
+    Approve -->|No| Plan
 ```
 
-Technique → exercise → session realization → evidence → assessment → approved progression. Repertoire, notation, accompaniment, and hardware presets are supporting layers; none of them owns mastery.
+The long-term progression vocabulary is `discovered → developing → reliable-isolation → reliable-context → maintained`; `paused` and `retired` are separate lifecycle states. The current planner may suggest a next-level exercise after **two distinct, approved, comfortable successful foundation sessions**. That is **not** a formal mastery-state promotion.
 
-The canonical progression vocabulary is `discovered → developing → reliable-isolation → reliable-context → maintained`, with `paused` and `retired` as separate lifecycle states. The starter CLI does **not** implement promotion: its MIDI result is one take of advisory evidence, not a declaration of mastery.
+## Quick start — no keyboard required
 
-## Quick start
-
-Requires Python 3.11+; the planner and offline assessor use only the standard library.
+Requires Python 3.11 or newer. The planner, assessor, and tests need no third-party dependencies.
 
 ```sh
+git clone https://github.com/ryjen/piano-practice-system.git
+cd piano-practice-system
+
 python3 -m unittest discover -s tests -v
+
+# Deterministic session proposal from the synthetic example history
 python3 -m piano_practice.cli plan --date 2026-11-10
-python3 -m piano_practice.cli assess examples/midi-takes/pulse-quarter-pass.json
+
+# Verify a synthetic MIDI take (no real keyboard needed)
+python3 -m piano_practice.cli assess \
+  examples/midi-takes/pulse-quarter-pass.json
 ```
 
-To install the optional MIDI interface:
-
-```sh
-python3 -m pip install -e '.[midi]'
-pianoctl ports
-pianoctl capture --port 'EXACT INPUT PORT NAME' --exercise pulse-quarter --seconds 20 --bpm 60 > local/pulse-take.json
-pianoctl assess local/pulse-take.json
-```
-
-Create `local/` first. Select the *note* USB MIDI port, not the DAW transport/control surface port; see [Oxygen Pro 61 setup](docs/hardware/oxygen-pro-61.md). Capture is duration-bounded; release the final note before capture finishes. The CLI records note events, velocities, and CC64 only, not audio. Pass the actual practice tempo using `--bpm` when it differs from the exercise default; this tempo is self-declared, not independently verified. No uploads occur.
-
-## Practice rhythm
-
-`config/practice.json` expresses a Tuesday/Thursday evening **planning preference** (America/Vancouver, 20 minutes). It does not install a calendar event, background job, or notification. Invoke `plan` with an explicit date; a 5-minute fallback is always offered.
-
-Each proposed session has **one technique**, one bounded exercise, and one self-check. The planner rotates among three approachable foundational techniques and advances a technique only after two approved passing sessions on separate dates, with a comfortable self-report. If difficulty or tension is explicitly reported, it repeats at a reduced tempo. Absent history is unknown, not assumed novice proficiency or mastery.
-
-Public examples are synthetic. For actual practice, copy `examples/learner-state.json` to `local/learner-state.json` and set permissions to `0600`. Only the explicit `feedback apply` command updates approved history; proposals and MIDI assessments are read-only. See [feedback approval](docs/feedback.md).
-
-## Completing the feedback loop
+For real practice, copy the synthetic learner state into a private working directory:
 
 ```sh
 mkdir -p local
 cp examples/learner-state.json local/learner-state.json
 chmod 600 local/learner-state.json
 
-python3 -m piano_practice.cli feedback propose \
-  --state local/learner-state.json \
-  --id pulse-nov10-session1 --date 2026-11-10 --exercise pulse-quarter \
-  --feedback appropriate --comfort comfortable --passed yes --bpm 60 \
-  > local/proposal.json
-
-# Review local/proposal.json before accepting it.
-# Substitute the exact approval_key printed in that proposal:
-python3 -m piano_practice.cli feedback apply local/proposal.json \
-  --state local/learner-state.json --acknowledge 'sha256:THE_PROPOSAL_KEY'
-
-python3 -m piano_practice.cli plan --date 2026-11-12 \
-  --state local/learner-state.json
+python3 -m piano_practice.cli plan \
+  --date 2026-11-10 --state local/learner-state.json
 ```
 
-The approval key is a content acknowledgement, not an authentication signature.
-Automatic MIDI grading never sets `--passed` for you.
+The suggested five blocks are **prepare → baseline → isolate → musical context → verify**. Follow the session instructions and self-check before deciding whether you completed the exercise. `plan` reads state but never changes it.
 
-## Boundaries
+## M-Audio Oxygen Pro 61 setup
 
-- MIDI can confirm note numbers, onset spacing relative to one another, relative key velocity, and note-on/off pairing. It **cannot** establish fingering, posture, muscle tension, hand identity, sound quality, or click-phase alignment.
-- Oxygen Smart Chord, Smart Scale, Note Repeat, zones, octave shift, and arpeggiator may transform observable MIDI. Disable or explicitly document these modes for ordinary assessment.
-- Keep personal practice logs and captured data in ignored `local/`; public catalog and fixtures must be synthetic and redistributable.
-- Session proposals, feedback proposals, and MIDI assessment are read-only; only the explicit reviewed `feedback apply` step updates approved history. This does not promote canonical mastery state.
-- This repository does not implement AI systems or host personal data. It follows the guitar public-core separation of concerns without copying that codebase.
+The Oxygen Pro 61 is a **USB MIDI controller, not a standalone sound generator**. Connect it to a software instrument or external sound module to hear piano notes; the command-line system itself does not synthesize audio.
 
-See [architecture](docs/architecture.md), [hardware setup](docs/hardware/oxygen-pro-61.md), [roadmap](docs/roadmap.md), and [data contracts](contracts/v1/README.md).
+1. Connect the keyboard and use its ordinary note-playing MIDI input, not a DAW/HUI/Mackie transport port.
+2. For initial exercises, disable **Smart Chord**, **Smart Scale**, arpeggiator, Note Repeat, and layered/split zones. Confirm octave/transpose settings.
+3. Install the optional MIDI capture dependencies and enumerate ports:
 
-**Licensing:** Public visibility does not grant a software license. Licensing remains an explicit owner decision.
+```sh
+python3 -m pip install -e '.[midi]'
+pianoctl ports
+```
+
+4. With `local/` already created, replace the exact port name and capture an exercise. Release all notes before the time limit:
+
+```sh
+pianoctl capture \
+  --port 'EXACT INPUT PORT NAME' \
+  --exercise pulse-quarter --seconds 20 --bpm 60 \
+  > local/pulse-take.json
+
+pianoctl assess local/pulse-take.json
+```
+
+The catalog uses MIDI note numbers: **60 is middle C**, regardless of whether the DAW displays C3 or C4. The recorded tempo is **declared**, not independently measured against a click. Capture records MIDI notes and sustain CC64, not audio. [Detailed device guidance](docs/hardware/oxygen-pro-61.md) and [hardware qualification task](https://github.com/ryjen/piano-practice-system/issues/2).
+
+**Interpretation limit:** relative onset spacing must be within `min(120 ms, 25% of the target interval)` and alternating-dynamics exercises must rise *and* fall in MIDI velocity by the declared contrast. Neither check establishes expressive timing, acoustic loudness, fingering, or comfort.
+
+## Record feedback and approve it
+
+The `feedback propose` command creates a **read-only** proposal tied to the exact state, catalog, and revision. `feedback apply` is the explicit write boundary.
+
+```sh
+python3 -m piano_practice.cli feedback propose \
+  --state local/learner-state.json \
+  --id pulse-nov10-session1 --date 2026-11-10 \
+  --exercise pulse-quarter --feedback appropriate \
+  --comfort comfortable --passed yes --bpm 60 \
+  --evidence-ref local/pulse-take.json \
+  > local/proposal.json
+```
+
+**Review** `local/proposal.json`, including the player-reported pass result, physical comfort, date, exercise, and evidence reference. Use `--passed unknown` if you cannot confidently evaluate the self-check. MIDI assessment is never automatically substituted for the player's response.
+
+After review, copy the *exact* `approval_key` value from the proposal:
+
+```sh
+pianoctl feedback apply local/proposal.json \
+  --state local/learner-state.json \
+  --acknowledge 'sha256:PASTE_EXACT_REVIEWED_KEY'
+
+pianoctl plan --date 2026-11-12 --state local/learner-state.json
+```
+
+This apply operation rejects stale revisions, modified state/catalog content, and conflicting event IDs; exact retry is idempotent. The SHA-256 acknowledgement is **not a digital signature or user authentication**. Approvals use POSIX file locking and atomic replacement (Linux/macOS), and should not be run concurrently with editors that ignore the lock. See [feedback semantics](docs/feedback.md).
+
+## Source, evidence, and privacy
+
+- Canonical public materials: [exercise catalog](catalogs/exercises.json), [configuration](config/practice.json), [exchange contracts](contracts/v1/README.md), and [architecture](docs/architecture.md).
+- Public fixtures under `examples/` are synthetic. Keep actual practice history, MIDI takes, recordings, and unreviewed proposals in **ignored `local/`**; do not commit them.
+- Do not use MIDI scores to infer physical comfort, illness, finger placement, or mastery. Unknown observations remain unknown.
+- There is no account system, cloud synchronization, external inference, autonomous state promotion, or implicit expenditure.
+- Scheduling and repertoire expansion are [roadmap items](docs/roadmap.md); [approval/persistence work](https://github.com/ryjen/piano-practice-system/issues/3) and [real hardware qualification](https://github.com/ryjen/piano-practice-system/issues/2) are tracked separately.
+
+## Development
+
+```sh
+python3 -m unittest discover -s tests -v
+python3 -m piano_practice.cli --help
+```
+
+GitHub Actions validates the deterministic reference core and synthetic exercise fixtures. CI proves logic and contracts, **not** physical USB MIDI compatibility.
+
+**License status:** Public repository visibility is not a license. No permission to reuse or redistribute code is implied until a license is deliberately selected.
