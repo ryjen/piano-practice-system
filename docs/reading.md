@@ -32,6 +32,16 @@ repository's local-first guarantees.
 no direct Oxygen Pro 61 USB/ALSA MIDI device mapping. External app compatibility
 and in-browser MIDI permissions have not been physically verified here.
 
+## DAW choice and monitoring
+
+The user may play through **REAPER** (native Linux/macOS) or **GarageBand**
+(on the Mac). Both can provide a piano sound and metronome while reading.
+The proposed trainer must remain independent of the DAW: the exact MIDI
+pitch is judged from a selected keyboard input, not a DAW-processed audio
+return, piano-roll visualization, or transposed virtual-instrument track.
+Whether a MIDI port can be consumed by both simultaneously is host-dependent
+and must be tested rather than assumed. See [DAW/MIDI qualification](daw-routing.md).
+
 ## Reading-first 20-minute session
 
 The current `practice-config/v1` budget is unchanged (20 minutes total):
@@ -100,3 +110,5 @@ progress as metadata without transcribing the score.
 The goal is *reading unfamiliar notation*, not rewarding memorized scales
 or teaching which physical finger pressed the key. Human/teacher evaluation
 remains authoritative for physical technique.
+
+At 15 minutes, the configuration's explicit warmup override reduces the preparation exercise to one minute of reading and one minute of coordination. The full 20-minute reading-first breakdown above remains unchanged.

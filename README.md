@@ -61,6 +61,16 @@ This application is **not yet implemented** in this repository; the existing MID
 
 The default config now makes reading the **highest goal weight (5/5)** and reserves two of the existing three preparation minutes for a short cold-reading exercise; the remaining minute stays with two-hand coordination. This does not create new practice time or an external service. See [reading-first practice and planned MIDI interaction](docs/reading.md).
 
+## DAW choices: REAPER or GarageBand
+
+The optional sound and recording environment will be **REAPER on Linux** or
+**GarageBand on macOS** (REAPER can also run on macOS). Neither is required
+to grade an unseen note: the reading trainer should judge the selected
+keyboard MIDI input directly, with a DAW used only for sound, metronome,
+recording, or independent verification. Simultaneous DAW + trainer access
+must be qualified on the actual operating system before assuming a shared
+MIDI port works. See [DAW and MIDI routing](docs/daw-routing.md).
+
 ## Teaching acknowledgement
 
 Selected practice ideas, method-book choices, and the cue to use a **small, relaxed wrist movement when sounding and releasing chords** reflect guidance from piano teacher **Shirly Mann**. This independent software reference is not authored, reviewed, or endorsed by her. A wrist cue is a player/teacher observation, not MIDI-detected physical technique.

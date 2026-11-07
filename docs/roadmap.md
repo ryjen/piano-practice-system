@@ -54,3 +54,12 @@ exists. See `docs/reading.md` and the dedicated GitHub issue.
 Teacher-guided chord work now includes a small, comfortable wrist movement
 cue, with credit to Shirly Mann; this is not an auto-assessed biomechanical
 claim.
+
+### Optional DAW environments
+
+The piano-practice system will support a DAW-agnostic reading input contract,
+with **REAPER for Linux** and **GarageBand for macOS** as candidate local sound,
+metronome, and recording environments. No DAW API, plugin or private recording
+is required for note identification. Concurrent MIDI port routing, octave
+calibration, CC64 and physical-keyboard/DAW parity remain issue #2
+acceptance work; see `docs/daw-routing.md`.

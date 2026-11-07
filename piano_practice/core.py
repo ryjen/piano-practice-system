@@ -197,7 +197,7 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str,
     # All stage allocations remain bounded and exactly sum to duration.
     allocations = {15: (2, 2, 6, 3, 2), 20: (3, 3, 8, 4, 2), 30: (4, 4, 13, 6, 3)}
     stages = ("prepare", "baseline", "isolation", "musical-context", "verification")
-    warmup = warmups_for_prepare(config, allowed, allocations[minutes][0])
+    warmup = warmups_for_prepare(config, allowed, allocations[minutes][0], minutes)
     context_refs = reviewed_context(active, by_id, focus)
     return {
         "record_type": "session-proposal",

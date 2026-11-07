@@ -45,5 +45,19 @@
       "minutes": 1,
       "prompt": "Slowly align one LH/RH entry and release; monitor comfort."
     }
-  ]
+  ],
+  "warmups_by_duration": {
+    "15": [
+      {
+        "technique_id": "reading",
+        "minutes": 1,
+        "prompt": "Cold-read an unseen staff note; find it on the keyboard without revealing the name."
+      },
+      {
+        "technique_id": "coordination",
+        "minutes": 1,
+        "prompt": "Align one relaxed left/right-hand entry and release."
+      }
+    ]
+  }
 }

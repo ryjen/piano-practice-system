@@ -30,3 +30,11 @@ A passed trace cannot establish physical key assignment, hand identity, motor te
 The MIDI assessor rejects any negative or noninteger event timestamp, including
 the first event. A structurally valid take is still only advisory evidence,
 not physical Oxygen Pro 61 qualification.
+
+## Selected DAW compatibility targets
+
+The current expected DAWs are **REAPER** on Linux (or macOS) and
+**GarageBand** on macOS. See [DAW and MIDI routing](../daw-routing.md)
+for separate OS/DAW acceptance checklists and the independently verified
+musical input port vs controller input port distinction. Neither DAW or
+simultaneous DAW/trainer MIDI access is hardware-qualified yet.

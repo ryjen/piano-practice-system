@@ -97,6 +97,26 @@ class WeightedPracticePlanTests(unittest.TestCase):
                     "2026-11-10", focus_override="nonexistent")
         self.assertEqual(self.state["revision"], 0)
 
+    def test_reading_first_warmups_fit_all_supported_session_durations(self):
+        expected = {15: [1, 1], 20: [2, 1], 30: [2, 1]}
+        for duration, amounts in expected.items():
+            with self.subTest(duration=duration):
+                config = copy.deepcopy(self.config)
+                config["duration_minutes"] = duration
+                plan = propose(self.catalog, self.state, config, "2026-11-10")
+                prepare = plan["stages"][0]["minutes"]
+                rows = plan["warmups_within_prepare"]
+                self.assertEqual([x["minutes"] for x in rows], amounts)
+                self.assertLessEqual(sum(amounts), prepare)
+                self.assertEqual(sum(x["minutes"] for x in plan["stages"]), duration)
+
+    def test_invalid_short_session_override_fails_closed(self):
+        config = copy.deepcopy(self.config)
+        config["duration_minutes"] = 15
+        config["warmups_by_duration"]["15"][0]["minutes"] = 2
+        with self.assertRaisesRegex(ValueError, "exceed"):
+            propose(self.catalog, self.state, config, "2026-11-10")
+
     def test_invalid_weights_and_warmups_rejected(self):
         for problem in (
             {"reading": 3},

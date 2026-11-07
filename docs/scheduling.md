@@ -77,3 +77,10 @@ Stop or simplify practice for discomfort. No silent mastery, recurring
 notifications, calendar writes, auto-uploaded recordings, or paid integrations.
 
 The reading-first priority is a configuration choice, not an inferred learner diagnosis. The separate [reading trainer milestone](reading.md) is designed to provide unseen notation and immediate keyboard feedback; existing fixed exercises and the offline MIDI assessor alone cannot demonstrate true sight-reading.
+
+For a **15-minute** session, `warmups_by_duration.15` explicitly uses one
+minute for cold reading plus one minute for coordination, fitting its
+two-minute preparation stage. At **20 or 30 minutes**, the standard two-minute
+reading and one-minute coordination prompts fit the respective three/four-minute
+preparation stages. No prompts are silently truncated, and an over-budget
+override fails closed.
