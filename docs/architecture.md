@@ -32,7 +32,7 @@ flowchart TD
 - `plan` and `assess` are pure with respect to canonical state: JSON in, JSON out.
 - Each technique has one foundational and one next-stage exercise in the initial catalog. Two **distinct** approved passing foundation-session dates with comfort confirmed permit stage-1 recommendation; they do not prove mastery.
 - Round-trip captured note-on/off events by channel+pitch. MIDI note-on with velocity zero is note-off. Reject missing/overlapping/unpaired notes and extra notes, instead of overclaiming performance accuracy.
-- Inter-onset spacing is a *relative* metric; alignment to an audible click is unknown unless the clock source is synchronized.
+- Inter-onset spacing is a *relative* metric; alignment to an audible click is unknown unless the clock source is synchronized. A slower planned tempo must be explicitly recorded as `bpm` in the MIDI take; the assessor otherwise uses the catalog tempo.
 - The initial `alternate` velocity gate is a coarse relative contrast, not an acoustic loudness or touch assessment.
 - Capture never attests to a hardware configuration. Synthetic fixtures test logical contracts, not the Oxygen USB stack.
 - No scores silently update progression. No inference from missing observations. No proficiency or repertoire assumption.

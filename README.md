@@ -38,11 +38,11 @@ To install the optional MIDI interface:
 ```sh
 python3 -m pip install -e '.[midi]'
 pianoctl ports
-pianoctl capture --port 'EXACT INPUT PORT NAME' --exercise pulse-quarter --seconds 20 > local/pulse-take.json
+pianoctl capture --port 'EXACT INPUT PORT NAME' --exercise pulse-quarter --seconds 20 --bpm 60 > local/pulse-take.json
 pianoctl assess local/pulse-take.json
 ```
 
-Create `local/` first. Select the *note* USB MIDI port, not the DAW transport/control surface port; see [Oxygen Pro 61 setup](docs/hardware/oxygen-pro-61.md). Capture is duration-bounded; release the final note before capture finishes. The CLI records note events, velocities, and CC64 only, not audio. No uploads occur.
+Create `local/` first. Select the *note* USB MIDI port, not the DAW transport/control surface port; see [Oxygen Pro 61 setup](docs/hardware/oxygen-pro-61.md). Capture is duration-bounded; release the final note before capture finishes. The CLI records note events, velocities, and CC64 only, not audio. Pass the actual practice tempo using `--bpm` when it differs from the exercise default; this tempo is self-declared, not independently verified. No uploads occur.
 
 ## Practice rhythm
 

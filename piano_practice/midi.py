@@ -54,7 +54,10 @@ def assess(take: dict, catalog: dict) -> dict:
     played = [ev["note"] for ev in onsets]
     expected = ex["notes"]
     pitches = "pass" if played == expected else "fail"
-    target_interval = 60000.0 / ex["bpm"] / ex["subdivision"]
+    declared_bpm = take.get("bpm", ex["bpm"])
+    if type(declared_bpm) is not int or not 40 <= declared_bpm <= 180:
+        raise ValueError("declared bpm must be an integer from 40 to 180")
+    target_interval = 60000.0 / declared_bpm / ex["subdivision"]
     gaps = [onsets[i+1]["t_ms"] - onsets[i]["t_ms"] for i in range(len(onsets)-1)]
     deviation = max((abs(g - target_interval) for g in gaps), default=None)
     timing = "unknown" if len(gaps) != len(expected)-1 else (
@@ -84,10 +87,12 @@ def assess(take: dict, catalog: dict) -> dict:
         "pass": all(v in ("pass", "not-applicable") for v in checks.values()),
         "expected_note_count": len(expected),
         "observed_note_count": len(onsets),
+        "declared_bpm": declared_bpm,
         "target_interval_ms": round(target_interval, 3),
         "max_interval_deviation_ms": None if deviation is None else round(deviation, 3),
         "lifecycle_errors": sorted(set(errors)),
         "limitations": [
+            "tempo is declared by the player or catalog, not independently verified",
             "relative timing only; no proof of click-phase alignment",
             "MIDI note events do not verify which hand or finger played",
             "comfort and listening quality require explicit human observation",

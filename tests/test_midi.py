@@ -50,6 +50,15 @@ class MidiAssessmentTests(unittest.TestCase):
         self.take["events"].sort(key=lambda e: e["t_ms"])
         self.assertEqual(assess(self.take, self.catalog)["checks"]["inter_onset_intervals"], "fail")
 
+    def test_declared_tempo_is_used_for_a_slowed_practice_take(self):
+        for event in self.take["events"]:
+            event["t_ms"] = int(event["t_ms"] * 1.5)
+        self.assertFalse(assess(self.take, self.catalog)["pass"])
+        self.take["bpm"] = 40
+        result = assess(self.take, self.catalog)
+        self.assertTrue(result["pass"])
+        self.assertEqual(result["declared_bpm"], 40)
+
     def test_wrong_note_fails(self):
         self.take["events"][0]["note"] = 61
         self.take["events"][1]["note"] = 61

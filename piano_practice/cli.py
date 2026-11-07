@@ -36,6 +36,7 @@ def main(argv=None) -> int:
     record.add_argument("--port", required=True)
     record.add_argument("--exercise", required=True)
     record.add_argument("--seconds", type=float, default=20)
+    record.add_argument("--bpm", type=int, help="declared practice tempo; defaults to catalog tempo when omitted")
     args = parser.parse_args(argv)
     try:
         if args.command == "plan":
@@ -45,7 +46,7 @@ def main(argv=None) -> int:
         elif args.command == "ports":
             _print({"ports": input_ports()})
         elif args.command == "capture":
-            _print(capture(args.port, args.seconds, args.exercise))
+            _print(capture(args.port, args.seconds, args.exercise, args.bpm))
     except (ValueError, OSError, KeyError, TypeError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"pianoctl: {exc}", file=sys.stderr)
         return 2

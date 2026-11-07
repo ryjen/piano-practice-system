@@ -90,7 +90,17 @@ def propose(catalog: dict, state: dict, config: dict, on_date: str) -> dict:
         if s["exercise_id"] == foundation["id"]
         and s["passed"] is True and s["comfort"] == "comfortable"
     }
-    exercise = advanced[0] if len(successful_dates) >= 2 else foundation
+    foundation_history = sorted(
+        (s for s in active if s["exercise_id"] == foundation["id"]),
+        key=lambda s: s["date"],
+    )
+    latest_foundation = foundation_history[-1] if foundation_history else None
+    regression_signal = latest_foundation is not None and (
+        latest_foundation["feedback"] == "hard"
+        or latest_foundation["comfort"] == "tension"
+        or latest_foundation["passed"] is False
+    )
+    exercise = advanced[0] if len(successful_dates) >= 2 and not regression_signal else foundation
     recent = sorted(
         (s for s in active if s["exercise_id"] == exercise["id"]),
         key=lambda s: s["date"]

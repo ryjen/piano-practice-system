@@ -16,9 +16,11 @@ def input_ports() -> list[str]:
     return list(_require_mido().get_input_names())
 
 
-def capture(port: str, seconds: float, exercise_id: str) -> dict:
+def capture(port: str, seconds: float, exercise_id: str, bpm: int | None = None) -> dict:
     if not 1 <= seconds <= 300:
         raise ValueError("capture seconds must be between 1 and 300")
+    if bpm is not None and (type(bpm) is not int or not 40 <= bpm <= 180):
+        raise ValueError("bpm must be an integer from 40 to 180")
     mido = _require_mido()
     events = []
     with mido.open_input(port) as inp:
@@ -41,9 +43,12 @@ def capture(port: str, seconds: float, exercise_id: str) -> dict:
                 if len(events) >= 100000:
                     raise ValueError("too many MIDI events; capture aborted")
             time.sleep(0.005)
-    return {
+    result = {
         "contract_version": "midi-take/v1",
         "exercise_id": exercise_id,
         "source": "local-usb-midi",
         "events": events,
     }
+    if bpm is not None:
+        result["bpm"] = bpm
+    return result

@@ -71,6 +71,16 @@ class PlannerTests(unittest.TestCase):
         self.assertEqual(proposal["exercise_id"], "pulse-quarter")
         self.assertEqual(proposal["bpm"], 60)
 
+    def test_recent_failure_blocks_stage_advance(self):
+        self.add("2026-11-01", "pulse-quarter")
+        self.add("2026-11-02", "pulse-quarter")
+        self.add("2026-11-03", "pulse-quarter", feedback="hard", passed=False)
+        self.add("2026-11-04", "navigation-steps")
+        self.add("2026-11-05", "dynamics-contrast")
+        p = propose(self.catalog, self.state, self.config, "2026-11-10")
+        self.assertEqual(p["exercise_id"], "pulse-quarter")
+        self.assertEqual(p["bpm"], 55)
+
     def test_unknown_comfort_does_not_count_as_verified_success(self):
         for day in ("2026-11-01", "2026-11-02"):
             self.add(day, "pulse-quarter", comfort="unknown")
