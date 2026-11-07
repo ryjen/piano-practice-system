@@ -56,3 +56,10 @@ unknown hands, out-of-range fingers and gapped phases fail catalog validation.
 These are instructional references, **never sensed fingering**. The five-phase
 C-major scale arrangement and LH finger 3/4 crossing cues are explicitly
 provisional player-provided goals, not qualified physical evidence.
+
+
+A legacy one-note-per-onset session may report `hands: [null]` to
+preserve **unspecified** hand identity. In an explicit simultaneous pair, both
+intended roles must be named distinctly `left` and `right`.
+MIDI timing and within-group synchronization are `unknown` (not passing)
+when any extra onset remains unmatched after consuming the expected groups.

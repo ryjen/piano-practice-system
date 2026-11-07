@@ -75,8 +75,11 @@ def assess(take: dict, catalog: dict) -> dict:
     if type(declared_bpm) is not int or not 40 <= declared_bpm <= 180:
         raise ValueError("declared bpm must be an integer from 40 to 180")
     target_interval = 60000.0 / declared_bpm / ex["subdivision"]
-    all_group_notes_present = all(len(actual) == len(group["pitches"])
-                                  for actual, group in zip(observed_groups, groups))
+    all_group_notes_present = (
+        len(onsets) == len(expected) and
+        all(len(actual) == len(group["pitches"])
+            for actual, group in zip(observed_groups, groups))
+    )
     group_starts = [min(n["t_ms"] for n in group)
                     for group in observed_groups if group]
     gaps = [group_starts[i+1] - group_starts[i]

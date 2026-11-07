@@ -26,6 +26,16 @@ class MidiAssessmentTests(unittest.TestCase):
                     assess(take, self.catalog)
         self.assertTrue(assess(self.take, self.catalog)["pass"])
 
+    def test_released_trailing_extra_note_does_not_pass_timing(self):
+        self.take["events"].extend([
+            dict(t_ms=100000, type="note_on", channel=0, note=83, velocity=70),
+            dict(t_ms=100250, type="note_off", channel=0, note=83, velocity=0)
+        ])
+        result = assess(self.take, self.catalog)
+        self.assertEqual(result["checks"]["pitch_sequence"], "fail")
+        self.assertEqual(result["checks"]["inter_onset_intervals"], "unknown")
+        self.assertFalse(result["pass"])
+
     def test_synthetic_steady_pulse_passes(self):
         r = assess(self.take, self.catalog)
         self.assertTrue(r["pass"])

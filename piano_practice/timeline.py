@@ -35,10 +35,13 @@ def onset_groups(exercise: dict) -> list[dict]:
             raise ValueError("invalid onset-group size")
         if any(type(n) is not int or not 0 <= n <= 127 for n in pitches):
             raise ValueError("invalid onset-group pitch")
-        if any(h not in ("left", "right") for h in hands):
-            raise ValueError("explicit realization needs named intended hands")
-        if len(set(hands)) != len(hands):
-            raise ValueError("two notes cannot both claim the same intended hand")
+        # A singleton may retain unknown intended hand identity for a legacy
+        # one-note-per-onset exercise. Paired hand groups must explicitly name
+        # distinct LH and RH roles; null is not allowed in a paired onset.
+        if any(h not in ("left", "right", None) for h in hands):
+            raise ValueError("invalid intended hand")
+        if len(pitches) > 1 and set(hands) != {"left", "right"}:
+            raise ValueError("paired onset requires distinct named hands")
         groups.append({"pitches": list(pitches), "hands": list(hands)})
     if [p for group in groups for p in group["pitches"]] != notes:
         raise ValueError("onset-group pitch order does not match legacy notes")

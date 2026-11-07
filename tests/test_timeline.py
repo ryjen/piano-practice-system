@@ -49,6 +49,32 @@ class OnsetGroupTests(unittest.TestCase):
         self.assertEqual(session["realization"]["contract_version"], "onset-groups/v1")
         self.assertEqual(len(session["realization"]["onsets"]), len(session["notes_midi"]))
 
+    def test_legacy_session_realization_can_roundtrip_untagged_hand(self):
+        state = json.loads((ROOT / "examples/learner-state.json").read_text())
+        config = json.loads((ROOT / "config/practice.json").read_text())
+        session = propose(self.catalog, state, config, "2026-11-10")
+        self.assertEqual(
+            onset_groups({
+                "notes": session["notes_midi"],
+                "realization": session["realization"]
+            }),
+            session["realization"]["onsets"]
+        )
+        self.assertTrue(all(group["hands"] == [None]
+                            for group in session["realization"]["onsets"]))
+
+    def test_trailing_extra_note_cannot_pass_group_timing_or_sync(self):
+        for original in (self.take(), self.take(swap_pair=True)):
+            take = copy.deepcopy(original)
+            take["events"].extend([
+                dict(t_ms=100000, type="note_on", channel=0, note=81, velocity=50),
+                dict(t_ms=100250, type="note_off", channel=0, note=81, velocity=0)
+            ])
+            result = assess(take, self.catalog)
+            self.assertEqual(result["checks"]["pitch_sequence"], "fail")
+            self.assertEqual(result["checks"]["inter_onset_intervals"], "unknown")
+            self.assertEqual(result["checks"]["within_group_sync"], "unknown")
+
     def test_exact_simultaneous_octave_pairs_pass_advisory_checks(self):
         result = assess(self.take(), self.catalog)
         self.assertEqual(result["checks"]["pitch_sequence"], "pass")
