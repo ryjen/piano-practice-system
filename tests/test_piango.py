@@ -111,7 +111,7 @@ class PianGoExportTests(unittest.TestCase):
         self.assertEqual(ok.returncode, 0, ok.stderr)
         self.assertEqual(len(ET.fromstring(ok.stdout).findall(".//fingering")), 5)
         bad = subprocess.run(
-            args[:6] + ["does-not-exist"], cwd=ROOT,
+            args[:7] + ["does-not-exist"], cwd=ROOT,
             capture_output=True, text=True, check=False,
         )
         self.assertEqual(bad.returncode, 2)
