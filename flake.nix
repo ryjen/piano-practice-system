@@ -42,7 +42,7 @@
             python -m unittest discover -s tests -v
             python -m piano_practice.cli plan --date 2026-11-10 > "$TMPDIR/piano-plan.json"
             python -m piano_practice.cli assess examples/midi-takes/pulse-quarter-pass.json > "$TMPDIR/piano-assessment.json"
-            python -c 'import json; assert json.load(open("'$TMPDIR'/piano-assessment.json"))["pass"] is True'
+            python -c 'import json, os; assert json.load(open(os.environ["TMPDIR"] + "/piano-assessment.json"))["pass"] is True'
 
             mkdir -p "$out"
             cp "$TMPDIR/piano-plan.json" "$out/plan.json"
