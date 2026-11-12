@@ -285,6 +285,15 @@ The gate rules require separate approved, comfortable session dates with correct
 
 ## Development
 
+The pinned Nix flake provides Python 3.12 and repeats the existing standard-library
+unit tests and synthetic CLI smoke checks. Use `nix develop` for an interactive
+shell, or `mise run test` / `mise run check` for the short test suite / full
+flake check. mise is optional and does not manage a competing Python version.
+
+The default flake intentionally excludes optional hardware MIDI packages and
+does not qualify a physical keyboard.
+
+
 ```sh
 python3 -m unittest discover -s tests -v
 python3 -m piano_practice.cli --help
