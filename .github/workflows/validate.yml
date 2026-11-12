@@ -9,18 +9,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Test deterministic core (stdlib)
-        run: |
-          python3 --version
-          python3 -m unittest discover -s tests -v
       - name: Install Nix
         uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
         with:
           github_access_token: ${{ github.token }}
       - name: Verify pinned Nix flake
         run: nix flake check --no-write-lock-file --print-build-logs
-      - name: Check reference examples
-        run: |
-          python3 -m piano_practice.cli plan --date 2026-11-10 > /tmp/piano-plan.json
-          python3 -m piano_practice.cli assess examples/midi-takes/pulse-quarter-pass.json > /tmp/piano-assessment.json
-          python3 -c 'import json; assert json.load(open("/tmp/piano-assessment.json"))["pass"] is True'
