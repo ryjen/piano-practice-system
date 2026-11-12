@@ -1,7 +1,7 @@
 # Nix pins Python; mise is a thin interface to the same environment.
 [tasks.test]
 description = "Run standard-library unit tests within the pinned Nix development shell"
-run = "nix develop --command python -m unittest discover -s tests -v"
+run = "nix develop --no-write-lock-file --command python -m unittest discover -s tests -v"
 
 [tasks.check]
 description = "Run pinned Nix tests and deterministic CLI smoke checks"
