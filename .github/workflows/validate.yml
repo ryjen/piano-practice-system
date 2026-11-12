@@ -13,6 +13,12 @@ jobs:
         run: |
           python3 --version
           python3 -m unittest discover -s tests -v
+      - name: Install Nix
+        uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
+        with:
+          github_access_token: ${{ github.token }}
+      - name: Verify pinned Nix flake
+        run: nix flake check --no-write-lock-file --print-build-logs
       - name: Check reference examples
         run: |
           python3 -m piano_practice.cli plan --date 2026-11-10 > /tmp/piano-plan.json
