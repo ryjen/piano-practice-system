@@ -19,6 +19,7 @@
           default = pkgs.mkShell {
             packages = [ pkgs.python312 ];
             TZDIR = "${pkgs.tzdata}/share/zoneinfo";
+            PYTHONTZPATH = "${pkgs.tzdata}/share/zoneinfo";
             shellHook = ''
               export PYTHONPATH="$PWD''${PYTHONPATH:+:$PYTHONPATH}"
             '';
@@ -32,6 +33,7 @@
           core = pkgs.runCommand "piano-practice-core-check" {
             nativeBuildInputs = [ pkgs.python312 ];
             TZDIR = "${pkgs.tzdata}/share/zoneinfo";
+            PYTHONTZPATH = "${pkgs.tzdata}/share/zoneinfo";
           } ''
             cp -R ${self} source
             chmod -R u+w source
